@@ -1,0 +1,125 @@
+---
+import type { HouseRules } from '@/types/listing/listing';
+import type { SafetyProperty } from '@/types/listing/safetyProperty';
+import { detectLanguage, getTranslation, translate } from '@/utils/i18n';
+import { formatHour } from '@/utils/formatHour';
+import ModalHouseRules from './ModalHouseRules.astro';
+import ModalSafetyProperty from './ModalSafetyProperty.astro';
+import AppButton from '../Common/AppButton.astro';
+import { CheckInStartTime } from '@/types/enums/houseRules/checkInStartTime';
+import { CheckInEndTime } from '@/types/enums/houseRules/checkInEndTime';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+
+interface Props {
+  houseRules: HouseRules;
+  safetyProperty: SafetyProperty;
+}
+const { houseRules, safetyProperty }: Props = Astro.props;
+const basePath = 'listingDetail.thingsToKnow';
+const baseHouse = 'listingDetail.thingsToKnow.houseRules';
+const baseSafety = 'listingDetail.thingsToKnow.safetyProperty';
+
+const title = translate(t, `${basePath}.title`);
+const titleHouse = translate(t, `${baseHouse}.title`);
+const checkInStartTime = houseRules?.checkInStartTime;
+const checkInEndTime = houseRules?.checkInEndTime;
+let checkInMessage: string;
+if (
+  checkInStartTime == CheckInStartTime.TIME_FLEXIBLE &&
+  checkInEndTime == CheckInEndTime.TIME_FLEXIBLE
+) {
+  checkInMessage = translate(t, `${baseHouse}.checkInOut.flexibleCheckIn`);
+} else if (checkInStartTime && checkInEndTime == CheckInEndTime.TIME_FLEXIBLE) {
+  const formattedStart = formatHour(checkInStartTime);
+  checkInMessage = translate(t, `${baseHouse}.checkInOut.checkInFrom`, {
+    start: formattedStart,
+  });
+} else {
+  const formattedStart = formatHour(checkInStartTime);
+  const formattedEnd = formatHour(checkInEndTime);
+  checkInMessage = translate(t, `${baseHouse}.checkInOut.startEnd`, {
+    start: formattedStart,
+    end: formattedEnd,
+  });
+}
+const formattedCheckout = formatHour(houseRules.checkoutTime);
+const checkoutMessage = translate(t, `${baseHouse}.checkInOut.checkout`, {
+  checkout: formattedCheckout,
+});
+const guestNumber = translate(t, `${baseHouse}.duringStay.guestNumber`, {
+  count: houseRules.guestNumber,
+});
+const titleSafetyProperty = translate(t, `${baseSafety}.title`);
+const knowMore = translate(t, `${basePath}.knowMore`);
+const titleCancellationPolicy = translate(
+  t,
+  `${basePath}.cancellationPolicy.title`
+);
+const carbonMonoxideDetector = safetyProperty.carbonMonoxideDetector
+  ? translate(t, `${baseSafety}.safetyDevices.carbonMonoxideDetector.yes`)
+  : translate(t, `${baseSafety}.safetyDevices.carbonMonoxideDetector.no`);
+const smokeDetector = safetyProperty.smokeDetector
+  ? translate(t, `${baseSafety}.safetyDevices.smokeDetector.yes`)
+  : translate(t, `${baseSafety}.safetyDevices.smokeDetector.no`);
+---
+
+<section class="my-8 space-y-6">
+  <h1 class="title-listing">
+    {title}
+  </h1>
+  <div class="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-3 lg:grid-cols-3">
+    <div class="space-y-4">
+      <h2
+        class="justify-center self-stretch text-xl leading-loose font-medium lg:text-2xl"
+      >
+        {titleHouse}
+      </h2>
+      <ul class="flex flex-col gap-2 text-sm font-medium">
+        <li>{checkInMessage}</li>
+        <li>{checkoutMessage}</li>
+        <li>{guestNumber}</li>
+      </ul>
+      <AppButton
+        label={knowMore}
+        variant="link"
+        size="xs"
+        icon="chevron-right"
+        modalId="rule-houses"
+      />
+      <ModalHouseRules
+        houseRules={houseRules}
+        checkInMessage={checkInMessage}
+        checkoutMessage={checkoutMessage}
+      />
+    </div>
+    <div class="space-y-4">
+      <h2
+        class="justify-center self-stretch text-xl leading-loose font-medium lg:text-2xl"
+      >
+        {titleSafetyProperty}
+      </h2>
+      <ul class="flex flex-col gap-2 text-sm font-medium">
+        <li>{carbonMonoxideDetector}</li>
+        <li>{smokeDetector}</li>
+      </ul>
+      <AppButton
+        label={knowMore}
+        variant="link"
+        size="xs"
+        icon="chevron-right"
+        modalId="safety-property"
+      />
+      <ModalSafetyProperty safetyProperty={safetyProperty} />
+    </div>
+    <div>
+      <h2
+        class="justify-center self-stretch text-xl leading-loose font-medium lg:text-2xl"
+      >
+        {titleCancellationPolicy}
+      </h2>
+      <div id="cancellation-policy-container"></div>
+    </div>
+  </div>
+</section>

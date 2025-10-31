@@ -1,0 +1,104 @@
+---
+import Trips from '@/components/React/Profile/Trips';
+import About from '@/components/React/Profile/About';
+import Reviews from '@/components/React/Profile/Reviews';
+import Listings from '@/components/React/Profile/Listings';
+import MainLayout from '@/layouts/MainLayout.astro';
+import { fetchUsersById } from '@/services/users';
+import type { User } from '@/types/user';
+import { detectLanguage, getTranslation, translate } from '@/utils/i18n';
+import { Icon } from 'astro-icon/components';
+import HostCard from '@/components/React/Common/HostCard';
+
+const { params } = Astro;
+const id = Number(params.id);
+const user: User | null = await fetchUsersById(id);
+if (!user) {
+  return new Response(null, { status: 404 });
+}
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+const title = user.isHost ? t.profile.profileHost : t.profile.profileGuest;
+const hasAbout = user.info && user.info.about && user.info.about.trim();
+---
+
+<MainLayout title={title} isActions={true}>
+  <section class="px-4 py-3 sm:px-8 md:px-12 lg:px-16 xl:px-20">
+    <div
+      class="grid grid-cols-1 space-y-8 gap-x-10 md:grid-cols-5 lg:grid-cols-7"
+    >
+      <div class="col-span-1 space-y-10 md:col-span-2 lg:col-span-2">
+        <button
+          onclick="history.back()"
+          class="flex cursor-pointer items-center gap-x-1 text-xs lg:text-base"
+          aria-label="Close modal"
+        >
+          <Icon name="chevron-left-mini" />
+          {t.listingDetail.photo.goBack}
+        </button>
+        <HostCard
+          client:load
+          profilePicture={user.profilePicture}
+          username={user.username}
+          isSuperHost={user.isSuperHost}
+          isHost={user.isHost}
+          totalReviews={user.reviews
+            ? user.reviews.totalGuestsReviews + user.reviews.totalHostsReviews
+            : null}
+          becameAt={user.isHost
+            ? (user.becameHostAt ?? undefined)
+            : user.becameUserAt}
+          score={user.score ?? null}
+          id={id}
+          enableClick={false}
+          isOwnProfile={false}
+          trips={user.totalTrips ?? null}
+        />
+      </div>
+      <div class="col-span-1 md:col-span-3 lg:col-span-5 lg:pl-12">
+        <h1 class="text-2xl leading-loose font-bold">
+          {translate(t, 'profile.title', { username: user.username })}
+        </h1>
+        {
+          hasAbout && (
+            <div class="space-y-5 py-7">
+              <p class="text-xl leading-7 font-bold">
+                {translate(t, 'profile.about', { username: user.username })}
+              </p>
+              <p>{user.info?.about}</p>
+            </div>
+          )
+        }
+        <About
+          client:visible
+          user={user}
+          lang={lang}
+          showBirthDecade={user.info
+            ? user.info.birthDecade !== undefined
+            : false}
+        />
+        <Trips client:visible user={user} lang={lang} />
+        {
+          user.interests && user.interests.length > 0 && (
+            <div class="py-7">
+              <p class="text-xl leading-7 font-bold">
+                {translate(t, 'profile.interests', { username: user.username })}
+              </p>
+              <div class="flex flex-wrap gap-x-4 gap-y-3 pt-8">
+                {user.interests.map((interest) => (
+                  <div class="text-grey-700 border-secondary flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition">
+                    <p class="text-xs font-normal">
+                      {translate(t, `interests.${interest.name}`)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        }
+        {user.reviews && <Reviews client:visible user={user} lang={lang} />}
+        <Listings client:visible user={user} lang={lang} />
+      </div>
+    </div>
+  </section>
+</MainLayout>

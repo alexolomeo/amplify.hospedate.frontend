@@ -1,0 +1,116 @@
+---
+import { Icon } from 'astro-icon/components';
+import {
+  detectLanguage,
+  getTranslation,
+  type SupportedLanguages,
+} from '@/utils/i18n';
+
+export interface Props {
+  lang?: SupportedLanguages;
+}
+
+const { lang: propLang } = Astro.props;
+const lang =
+  propLang || detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+
+const faqHuesped = t.supportPage.faq.guest.map((faq, index) => ({
+  ...faq,
+  open: index === t.supportPage.faq.guest.length - 1, // Last item expanded by default
+}));
+
+const faqAnfitrion = t.supportPage.faq.host.map((faq, index) => ({
+  ...faq,
+  open: index === t.supportPage.faq.host.length - 1, // Last item expanded by default
+}));
+---
+
+<div class="min-h-screen bg-white">
+  <main>
+    <section class="bg-base-150 py-16">
+      <div class="container mx-auto max-w-3xl px-4">
+        <!-- Section title -->
+        <h2 class="text-primary mb-8 text-2xl md:text-3xl">
+          <span>{t.supportPage.title.doubts}</span>
+          <span class="font-bold">{t.supportPage.title.weAnswer}</span>
+        </h2>
+        <!-- Decorative line -->
+        <div class="bg-primary my-2 mb-8 h-1 w-12"></div>
+
+        <!-- Tabs -->
+        <div role="tablist" class="tabs tabs-border mb-8">
+          <label class="tab">
+            <input
+              type="radio"
+              name="faqTabs"
+              role="tab"
+              aria-label={t.supportPage.tabs.host}
+              checked
+            />
+            {t.supportPage.tabs.host}
+            <Icon name="briefcase" class="ml-2 inline h-5 w-5" />
+          </label>
+          <div role="tabpanel" class="tab-content p-4">
+            <div class="space-y-3">
+              {
+                faqAnfitrion.map((faq, index) => (
+                  <div class="has-[:checked]:bg-base-200 bg-primary/10 collapse-arrow collapse rounded-lg">
+                    <input
+                      type="checkbox"
+                      checked={faq.open}
+                      id={`anfitrion-faq-${index}`}
+                    />
+                    <label
+                      for={`anfitrion-faq-${index}`}
+                      class="collapse-title text-md text-base-content cursor-pointer font-semibold"
+                    >
+                      {faq.question}
+                    </label>
+                    <div class="collapse-content text-sm text-gray-700">
+                      <Fragment set:html={faq.answer} />
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+          <label class="tab">
+            <input
+              type="radio"
+              name="faqTabs"
+              role="tab"
+              aria-label={t.supportPage.tabs.guest}
+            />
+            {t.supportPage.tabs.guest}
+            <Icon name="thumb-up" class="ml-2 inline h-5 w-5" />
+          </label>
+          <div role="tabpanel" class="tab-content p-4">
+            <div class="space-y-3">
+              {
+                faqHuesped.map((faq, index) => (
+                  <div class="has-[:checked]:bg-base-200 bg-primary/10 collapse-arrow collapse rounded-lg">
+                    <input
+                      type="checkbox"
+                      checked={faq.open}
+                      id={`huesped-faq-${index}`}
+                    />
+                    <label
+                      for={`huesped-faq-${index}`}
+                      class="collapse-title text-md text-base-content cursor-pointer font-semibold"
+                    >
+                      {faq.question}
+                    </label>
+                    <div class="collapse-content text-sm text-gray-700">
+                      <Fragment set:html={faq.answer} />
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

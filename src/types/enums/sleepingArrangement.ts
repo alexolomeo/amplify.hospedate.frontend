@@ -1,0 +1,16 @@
+export enum SleepingArrangementType {
+  AirMattress = 'AIR_MATTRESS',
+  BunkBed = 'BUNK_BED',
+  Couch = 'COUCH',
+  Crib = 'CRIB',
+  Double = 'DOUBLE',
+  FloorMattress = 'FLOOR_MATTRESS',
+  Hammock = 'HAMMOCK',
+  King = 'KING',
+  Queen = 'QUEEN',
+  Single = 'SINGLE',
+  SmallDouble = 'SMALL_DOUBLE',
+  SofaBed = 'SOFA_BED',
+  ToddlerBed = 'TODDLER_BED',
+  WaterBed = 'WATER_BED',
+}

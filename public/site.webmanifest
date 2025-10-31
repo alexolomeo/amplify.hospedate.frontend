@@ -1,0 +1,22 @@
+{
+  "name": "Hospédate Bolivia",
+  "short_name": "Hospédate",
+  "description": "Plataforma de alojamiento en Bolivia",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/apple-touch-icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#3674CE",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/"
+}

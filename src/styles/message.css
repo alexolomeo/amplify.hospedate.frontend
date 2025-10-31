@@ -1,0 +1,23 @@
+.bubble-tail-left::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-top: 25px solid transparent;
+  border-right: 25px solid var(--color-base-150);
+  border-bottom: 0 solid transparent;
+}
+
+.bubble-tail-right::before {
+  content: '';
+  position: absolute;
+  right: -10px;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-top: 25px solid transparent;
+  border-left: 25px solid var(--color-secondary-content);
+  border-bottom: 0 solid transparent;
+}

@@ -1,0 +1,103 @@
+---
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+import { Icon } from 'astro-icon/components';
+import { clsx } from 'clsx';
+
+const DEFAULT_SPACING_CLASSES = 'pb-5 pt-10 px-6 md:px-12 lg:px-16 xl:px-20';
+interface Props {
+  responsiveSpacing?: string;
+}
+const { responsiveSpacing = DEFAULT_SPACING_CLASSES } = Astro.props;
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+const firstColumn = [
+  { href: '/cancellation', label: t.footer.cancellationOptions },
+  { href: '/support', label: t.footer.support },
+];
+const SecondColumn = [
+  { href: '/listing/create/', label: t.footer.becomeHost },
+  { href: '/protection-fund/', label: t.footer.protectionFund },
+];
+const ThirdColumn = [
+  { href: '/privacy', label: t.footer.privacy },
+  { href: '/terms', label: t.footer.terms },
+];
+---
+
+<footer
+  class={clsx(
+    'footer sm:footer-horizontal text-base-content items-center bg-[var(--color-base-150)]',
+    responsiveSpacing
+  )}
+>
+  <div class="flex flex-col items-center gap-y-6 md:items-start lg:items-start">
+    <div
+      class="grid gap-x-10 gap-y-4 text-center md:grid-cols-5 md:text-start lg:grid-cols-11 lg:text-start"
+    >
+      <div
+        class="col-span-1 space-y-4 pb-4 md:col-span-2 md:pb-0 lg:col-span-5 lg:pb-0"
+      >
+        <a
+          href="/"
+          class="flex items-center justify-center gap-2 md:justify-start lg:justify-start"
+        >
+          <Icon name="isotipo" class="h-6 w-9" />
+          <Icon name="logotipo" class="h-5 w-20" />
+        </a>
+        <p class="text-neutral text-sm font-normal">
+          {t.footer.description}
+        </p>
+        <div
+          class="flex items-center justify-center gap-3 md:justify-start lg:justify-start"
+        >
+          <a href="https://www.instagram.com/hospedatebolivia/" target="_blank">
+            <Icon name="instagram" class="text-primary h-6 w-6" />
+          </a>
+          <a href="https://www.facebook.com/HospedateBolivia" target="_blank">
+            <Icon name="facebook" class="text-primary h-5.5 w-5.5" />
+          </a>
+          <a href="https://www.tiktok.com/@hospedatebolivia" target="_blank">
+            <Icon name="tiktok" class="text-primary h-5 w-5" />
+          </a>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2 lg:col-span-2">
+        <p class="text-neutral text-sm font-semibold">
+          {t.footer.assistance}
+        </p>
+        {
+          firstColumn.map((item) => (
+            <a href={item.href} class="text-sm">
+              {item.label}
+            </a>
+          ))
+        }
+      </div>
+      <div class="flex flex-col gap-2 lg:col-span-2">
+        <p class="text-neutral text-sm font-semibold">{t.footer.hostMode}</p>
+        {
+          SecondColumn.map((item) => (
+            <a href={item.href} class="text-sm">
+              {item.label}
+            </a>
+          ))
+        }
+      </div>
+      <div class="flex flex-col gap-2 pb-2 md:pb-0 lg:col-span-2 lg:pb-0">
+        <p class="text-neutral text-sm font-semibold">{t.footer.legal}</p>
+        {
+          ThirdColumn.map((item) => (
+            <a href={item.href} class="text-sm">
+              {item.label}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+    <aside class="items-center">
+      <p class="text-neutral text-sm">
+        © {new Date().getFullYear()} Hospédate. {t.footer.copyright}
+      </p>
+    </aside>
+  </div>
+</footer>

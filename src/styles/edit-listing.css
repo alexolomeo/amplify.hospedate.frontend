@@ -1,0 +1,9 @@
+.edit-listing-title {
+  @apply justify-center self-stretch text-lg leading-7 font-bold;
+}
+.edit-listing-description {
+  @apply text-neutral justify-center self-stretch text-xs font-normal;
+}
+.edit-listing-text-area {
+  @apply textarea focus:border-primary w-full rounded-xl leading-none focus:ring-0 focus:outline-none;
+}

@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Load nvm or set PATH to find npm/node
+export PATH="/usr/local/bin:$PATH"
+
+# Try to load nvm if it exists
+if [ -f "$HOME/.nvm/nvm.sh" ]; then
+  . "$HOME/.nvm/nvm.sh"
+fi
+
+# For ServBay users (your setup)
+if [ -d "/Applications/ServBay/script/alias" ]; then
+  export PATH="/Applications/ServBay/script/alias:$PATH"
+fi
+
+npm run commitlint ${1}

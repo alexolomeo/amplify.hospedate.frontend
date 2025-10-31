@@ -1,0 +1,18 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+import { detectLanguage } from '@/utils/i18n';
+import { SearchType, type QueryParams } from '@/types/search';
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+import ContentSwitcher from '@/components/React/Listing/ContentSwitcher';
+
+const queryparams: QueryParams = {
+  adults: 1,
+  limit: 40,
+  offset: 0,
+  searchType: SearchType.List,
+};
+---
+
+<MainLayout title="Hospédate Bolivia" isSearch={true} isActions={true}>
+  <ContentSwitcher client:load initialQuery={queryparams} lang={lang} />
+</MainLayout>

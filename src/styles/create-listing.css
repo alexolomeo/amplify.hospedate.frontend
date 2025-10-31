@@ -1,0 +1,3 @@
+.min-h-content-area {
+  min-height: calc(100vh - 76px - 120px);
+}

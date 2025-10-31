@@ -1,0 +1,26 @@
+---
+import PreviewResponsive from '@/components/React/Host/PreviewListing/PreviewResponsive';
+import { detectLanguage } from '@/utils/i18n';
+import MainLayout from '@/layouts/MainLayout.astro';
+
+const { params, request } = Astro;
+const lang = detectLanguage(request.headers, new URL(request.url));
+const listingId = params.listingId || '123';
+---
+
+<style is:global>
+  html,
+  body {
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow-x: hidden;
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+  }
+</style>
+<MainLayout title="" showFooter={false} showHeader={false}>
+  <PreviewResponsive client:load id={listingId as string} lang={lang} />
+</MainLayout>

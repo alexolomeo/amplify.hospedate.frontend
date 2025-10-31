@@ -1,0 +1,118 @@
+---
+import type { Host } from '@/types/listing/host';
+import { detectLanguage, getTranslation, translate } from '@/utils/i18n';
+import { Icon } from 'astro-icon/components';
+import AppButton from '../Common/AppButton.astro';
+import HostCard from '@/components/React/Common/HostCard';
+import ContactHost from '@/components/React/Listing/ContactHost';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+interface Props {
+  host: Host;
+  listingId?: number;
+}
+const { host, listingId }: Props = Astro.props;
+if (!host) {
+  return;
+}
+const title = t.listingDetail.host.title;
+const subtitle = t.listingDetail.host.subtitle;
+const subtitleSuperHost = translate(t, 'listingDetail.host.subtitleSuperHost', {
+  name: host.username,
+});
+// const responseRate = t.listingDetail.host.responseRate;
+const descriptionSuperHost = t.listingDetail.host.descriptionSuperHost;
+
+const infoEntries = Object.entries(host.info || {})
+  .filter(([key, value]) => value && !['about'].includes(key))
+  .map(([key, value]) => [key, Array.isArray(value) ? value.join(', ') : value])
+  .slice(0, 2);
+// function getResponseTimeText(minutes: number): string {
+//   const hours = Math.ceil(minutes / 60);
+//   if (hours <= 1) {
+//     return t.listingDetail.host.responseTime.lessThanHour;
+//   } else if (hours < 24) {
+//     return t.listingDetail.host.responseTime.lessThanDay;
+//   } else {
+//     return t.listingDetail.host.responseTime.moreThanDay;
+//   }
+// }
+---
+
+<div class="space-y-6 py-8">
+  <h1 class="title-listing">
+    {title}
+  </h1>
+  <div class="grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-5 lg:grid-cols-6">
+    <div class="col-span-1 md:col-span-2 lg:col-span-2">
+      <HostCard
+        client:visible
+        profilePicture={host.profilePicture}
+        username={host.username}
+        isSuperHost={host.isSuperHost}
+        isHost={true}
+        totalReviews={host.totalReviews || null}
+        becameAt={host.becameHostAt}
+        score={host.score != null && host.score >= 0 ? host.score : null}
+        id={host.id}
+        enableClick={true}
+        isOwnProfile={false}
+      />
+    </div>
+
+    <div
+      class="col-span-1 flex flex-col justify-center md:col-span-3 lg:col-span-4"
+    >
+      {
+        host.isSuperHost && (
+          <div>
+            <h2 class="self-stretch text-xl leading-7">{subtitleSuperHost}</h2>
+            <p class="pt-4 text-sm">{descriptionSuperHost}</p>
+          </div>
+        )
+      }
+      <div>
+        <h2 class="self-stretch text-xl leading-7">{subtitle}</h2>
+        <div class="space-y-2 self-stretch pt-4 text-sm">
+          {
+            listingId && (
+              <ContactHost
+                client:only="react"
+                host={host}
+                listingId={listingId}
+              />
+            )
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="col-span-1 space-y-6 md:col-span-2 lg:col-span-2">
+      <ul class="space-y-2 pt-6 text-sm">
+        {
+          infoEntries.map(([key, value]) => (
+            <li class="flex gap-x-2">
+              <Icon name="today" class="text-secondary h-5 w-5" size={20} />
+              {t.listingDetail.host.info[
+                key as keyof typeof t.listingDetail.host.info
+              ] ?? key}
+              : {value}
+            </li>
+          ))
+        }
+      </ul>
+      <div class="space-y-1 text-sm">
+        <p>{host.info?.about}</p>
+        <a href={`/users/${host.id}`}>
+          <AppButton
+            label={t.listingDetail.host.moreInfo}
+            variant="link"
+            size="sm"
+            icon="chevron-right"
+          />
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

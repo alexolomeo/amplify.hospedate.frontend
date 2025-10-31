@@ -1,0 +1,49 @@
+---
+/**
+ * Mobile Token Login Page
+ *
+ * This page handles the authentication flow for mobile app users transitioning to web.
+ * The mobile app requests a login token from the backend and redirects the user here.
+ *
+ * Query Parameters:
+ * - token (required): JWT token obtained from the backend via the mobile app
+ * - redirect (optional): URL to redirect after successful authentication (defaults to '/')
+ *
+ * Flow:
+ * 1. Validate token parameter exists
+ * 2. Call backend endpoint POST /api/auth/login-token
+ * 3. Set session tokens and emit auth events
+ * 4. Check if user needs to complete registration
+ * 5. Redirect to target page or registration flow
+ *
+ * Error Handling:
+ * - Missing token: Redirects to /auth?error=missing_token
+ * - Login failure: Redirects to /auth with error message and preserves redirect URL
+ * - Registration required: Redirects to /auth with redirect URL to continue after registration
+ */
+import MinimalLayout from '@/layouts/MinimalLayout.astro';
+import MobileLoginHandler from '@/components/React/Auth/MobileLoginHandler';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+
+const headers = Astro.request.headers;
+const url = new URL(Astro.request.url);
+const params = url.searchParams;
+const lang = detectLanguage(headers, url);
+const t = getTranslation(lang);
+const token = params.get('token');
+const redirectUri = params.get('redirect') || '/';
+
+// Validate required parameters
+if (!token) {
+  return Astro.redirect('/auth?error=missing_token');
+}
+---
+
+<MinimalLayout title={t.auth.mobileLogin.title}>
+  <MobileLoginHandler
+    client:only="react"
+    token={token}
+    redirectUri={redirectUri}
+    lang={lang}
+  />
+</MinimalLayout>

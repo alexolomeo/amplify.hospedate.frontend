@@ -1,0 +1,12 @@
+import { STEPS } from '@/components/React/Utils/create-listing.steps';
+
+export const stepPaths: Record<number, string> = {
+  [STEPS.PLACE_INFORMATION_PLACE_TYPE]: '1-1',
+  [STEPS.PLACE_INFORMATION_CONFIRM_LOCATION]: '1-4',
+  [STEPS.PLACE_INFORMATION_CAPACITY]: '1-5',
+  [STEPS.PLACE_FEATURES_AMENITY]: '2-1',
+  [STEPS.PLACE_FEATURES_TITLE]: '2-3',
+  [STEPS.PLACE_FEATURES_DESCRIPTION]: '2-4',
+  [STEPS.PLACE_SETUP_PRICING]: '3-1',
+  [STEPS.PLACE_SETUP_DISCOUNT]: '3-2',
+};

@@ -1,0 +1,34 @@
+---
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+
+const currentPath = Astro.url.pathname;
+// TODO: Uncomment this section once the functionality is implemented
+const menuItems = [
+  { href: '/hosting', label: t.menu.dashboard, icon: 'today' },
+  { href: '/hosting/calendar', label: t.menu.calendar, icon: 'calendar' },
+  { href: '/hosting/listings', label: t.menu.listings, icon: 'home' },
+  { href: '/hosting/messages', label: t.menu.messages, icon: 'message' },
+];
+---
+
+<div>
+  <div class="hidden md:flex lg:flex">
+    {
+      menuItems.map((item) => (
+        <a
+          href={item.href}
+          class={`group m-1 flex gap-x-2 rounded-md p-2 text-sm/6 transition-colors ${
+            currentPath === item.href
+              ? 'font-semibold underline underline-offset-8'
+              : 'hover:text-primary'
+          }`}
+        >
+          {item.label}
+        </a>
+      ))
+    }
+  </div>
+</div>

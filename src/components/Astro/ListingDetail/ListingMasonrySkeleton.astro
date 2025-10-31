@@ -1,0 +1,35 @@
+---
+/**
+ * Server-side skeleton for ListingMasonry
+ * Shows immediately on page load before React hydrates
+ * Uses a simpler layout that approximates the masonry without exact matching
+ */
+---
+
+<div class="relative w-full animate-pulse">
+  <!-- Skeleton using CSS columns for a more natural masonry approximation -->
+  <div class="columns-2 gap-4 md:columns-3" style="column-fill: balance;">
+    <!-- Images with various aspect ratios -->
+    <div class="mb-4 break-inside-avoid">
+      <div class="aspect-[4/3] rounded-[40px] bg-[var(--color-base-300)]"></div>
+    </div>
+    <div class="mb-4 break-inside-avoid">
+      <div class="aspect-[3/2] rounded-[40px] bg-[var(--color-base-300)]"></div>
+    </div>
+    <div class="mb-4 break-inside-avoid">
+      <div class="aspect-square rounded-[40px] bg-[var(--color-base-300)]">
+      </div>
+    </div>
+    <div class="mb-4 break-inside-avoid">
+      <div class="aspect-[4/5] rounded-[40px] bg-[var(--color-base-300)]"></div>
+    </div>
+    <div class="mb-4 hidden break-inside-avoid md:block">
+      <div class="aspect-[3/4] rounded-[40px] bg-[var(--color-base-300)]"></div>
+    </div>
+  </div>
+
+  <!-- Show all photos button skeleton -->
+  <div class="absolute right-2 bottom-3 z-10">
+    <div class="h-10 w-48 rounded-3xl bg-[var(--color-base-300)]"></div>
+  </div>
+</div>

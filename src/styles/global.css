@@ -1,0 +1,230 @@
+@import 'tailwindcss';
+@import './create-listing.css';
+@import './edit-listing.css';
+
+body {
+  font-family: 'Outfit', sans-serif;
+}
+/* CreateListingLayout */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.search_label {
+  @apply text-neutral justify-center self-stretch text-xs leading-3 font-normal;
+}
+.search_input {
+  @apply justify-center self-stretch text-sm leading-tight font-normal;
+}
+.title-listing {
+  @apply justify-center self-stretch text-2xl leading-9 font-semibold lg:text-3xl;
+}
+.description-listing {
+  @apply justify-center self-stretch text-base leading-normal font-normal;
+}
+.register-input {
+  @apply input focus:border-primary h-[48px] w-full rounded-xl focus:ring-0 focus:outline-none;
+}
+@media (max-width: 767px) {
+  body.hide-global-header-mobile > header {
+    display: none !important;
+    overflow-y: hidden;
+  }
+}
+
+/* SearchBar visibility control based on custom breakpoint (1041px) */
+@media (min-width: 1041px) {
+  .show-from-1041 {
+    display: flex !important;
+  }
+
+  .hide-from-1041 {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1040px) {
+  .show-from-1041 {
+    display: none !important;
+  }
+
+  .hide-from-1041 {
+    display: block !important;
+  }
+}
+
+@media (min-width: 1041px) and (max-width: 1100px) {
+  .logo-condensed {
+    display: none !important;
+  }
+
+  .isotipo-only {
+    display: block !important;
+  }
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@plugin "daisyui" {
+  themes:
+    light --default,
+    dark --prefersdark,
+    cupcake;
+}
+
+@plugin "daisyui/theme" {
+  name: 'light';
+  default: true;
+  --color-primary: '#3674CE';
+  --color-secondary: '#6D9E36';
+  --color-accent: '#FFD160';
+  --color-neutral: '#75787C';
+  --color-neutral-10: '#75787C1A';
+  --color-base-100: '#FFFFFF';
+  --color-base-150: '#F1F7FD';
+  --color-base-200: '#C7E0F6';
+  --color-base-200-hover: '#EDF7FE';
+  --color-base-300: '#A1CDEF';
+  --color-primary-content: '#F1F7FD';
+  --color-secondary-content: '#F4FAEB';
+  --color-accent-content: '#FFFAEB';
+  --color-neutral-content: '#E6E7E7';
+  --color-base-content: '#1F2D4C';
+  --color-info-bg: '#2563EB';
+  --color-placeholder: '#9CA3AF';
+  --color-error-content: '#FFF2F1';
+  --color-error: '#F8493B';
+  --color-warning: '#F5761B';
+  --color-success: '#16A34A';
+}
+
+/* Basic styling for markdown content */
+.prose h1 {
+  font-size: 2.5em;
+  margin-top: 1.5em;
+}
+.prose h2 {
+  font-size: 2em;
+  margin-top: 1.2em;
+}
+.prose h3 {
+  font-size: 1.5em;
+  margin-top: 1em;
+}
+.prose h4 {
+  font-size: 1.25em;
+  margin-top: 0.8em;
+}
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+}
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+}
+.prose li {
+  margin-bottom: 0.5em;
+}
+.prose a {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+.prose strong {
+  font-weight: bold;
+}
+.prose em {
+  font-style: italic;
+}
+
+/* Table styling for markdown content */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.prose table th {
+  background-color: #3674ce;
+  color: white;
+  font-weight: 600;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 0.95em;
+  letter-spacing: 0.025em;
+}
+
+.prose table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+  vertical-align: middle;
+}
+
+.prose table tr:nth-child(even) td {
+  background-color: #f9fafb;
+}
+
+.prose table tr:hover td {
+  background-color: #f3f4f6;
+  transition: background-color 0.2s ease;
+}
+
+.prose table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Responsive table styling */
+@media (max-width: 768px) {
+  .prose table {
+    font-size: 0.875em;
+  }
+
+  .prose table th,
+  .prose table td {
+    padding: 8px 12px;
+  }
+}
+
+/* Safe area insets for iOS devices */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.pl-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.pr-safe {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Fullscreen map styles */
+:fullscreen {
+  background-color: white;
+}
+
+:-webkit-full-screen {
+  background-color: white;
+}
+
+:-moz-full-screen {
+  background-color: white;
+}
+
+:-ms-fullscreen {
+  background-color: white;
+}

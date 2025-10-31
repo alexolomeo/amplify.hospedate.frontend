@@ -1,0 +1,88 @@
+---
+import type { ListingDetail } from '@/types/listing/listing';
+import ListingDetailInfo from '../../ListingDetail/ListingDetailInfo.astro';
+import ListingDetailDescription from '../../ListingDetail/ListingDetailDescription.astro';
+import ListingDetailAmenity from '../../ListingDetail/ListingDetailAmenity.astro';
+import ListingDetailReview from '../../ListingDetail/ListingDetailReview.astro';
+import ListingDetailRating from '../../ListingDetail/ListingDetailRating.astro';
+import ListingDetailHost from '../../ListingDetail/ListingDetailHost.astro';
+import ListingDetailThingsToKnow from '../../ListingDetail/ListingDetailThingsToKnow.astro';
+import ListingDetailMap from '../../ListingDetail/ListingDetailMap.astro';
+import { detectLanguage } from '@/utils/i18n';
+import { getSafeText } from '@/utils/displayHelpers';
+import { formatAddress } from '@/utils/formatAddress';
+import BookingContainer from '@/components/React/Listing/BookingContainer';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+
+interface Props {
+  listing: ListingDetail;
+  showHeader?: boolean;
+}
+const { listing }: Props = Astro.props;
+---
+
+<div class="bg-[var(--color-base-150)] py-8">
+  <div class="mx-auto flex justify-center px-4">
+    <div
+      class="border-base-300 w-[390px] overflow-hidden rounded-[28px] border bg-white shadow-sm sm:w-[414px]"
+    >
+      <section
+        id="detail-scroll"
+        class="max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain px-5 py-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:h-0 [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar-thumb]:bg-transparent [&::-webkit-scrollbar-track]:bg-transparent"
+      >
+        <div class="py-4">
+          <h1 class="text-2xl font-bold">
+            {getSafeText(listing.title, lang)}
+          </h1>
+        </div>
+
+        <div id="mansory-container"></div>
+
+        <div class="space-y-6 py-6">
+          <ListingDetailInfo listing={listing} />
+          <ListingDetailDescription description={listing.description} />
+          <div id="sleeping-container"></div>
+          <ListingDetailAmenity amenities={listing.amenities} />
+          <div id="calendar-container"></div>
+        </div>
+
+        {listing.rating && <ListingDetailRating rating={listing.rating} />}
+        {
+          listing.reviews && listing.rating && (
+            <ListingDetailReview
+              reviews={listing.reviews}
+              rating={listing.rating}
+              id={listing.id}
+            />
+          )
+        }
+
+        <ListingDetailHost host={listing.host} />
+
+        <BookingContainer
+          client:only
+          id={listing.id}
+          city={listing.location.city}
+          petsAllowed={listing.houseRules.petsAllowed}
+          maxGuests={listing.placeInfo.guestNumber}
+          calendarSettings={listing.calendar}
+          houseRules={listing.houseRules}
+        />
+
+        <ListingDetailThingsToKnow
+          houseRules={listing.houseRules}
+          safetyProperty={listing.safetyProperty}
+        />
+
+        <ListingDetailMap
+          address={formatAddress(listing)}
+          coordinates={listing.location.coordinates}
+          showSpecificLocation={listing.showSpecificLocation}
+        />
+
+        <div class="mb-24"></div>
+      </section>
+    </div>
+  </div>
+</div>

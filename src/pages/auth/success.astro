@@ -1,0 +1,65 @@
+---
+import AppButton from '@/components/Astro/Common/AppButton.astro';
+import { Platform } from '@/types/enums/platform';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+import { Icon } from 'astro-icon/components';
+import '@/styles/global.css';
+
+const headers = Astro.request.headers;
+const url = new URL(Astro.request.url);
+const params = url.searchParams;
+const lang = detectLanguage(headers, url);
+const t = getTranslation(lang);
+const appScheme = import.meta.env.PUBLIC_APP_DEEP_LINK_BASE;
+
+const token = params.get('token');
+const platform = params.get('platform');
+const deepLink = token
+  ? `${appScheme}/auth?token=${encodeURIComponent(token)}`
+  : null;
+---
+
+<html lang={lang} class="h-full" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{t.auth.welcomeTitle}</title>
+  </head>
+  <body class="bg-base-100 flex min-h-screen items-center justify-center">
+    {
+      platform == Platform.Mobile && (
+        <div class="flex flex-col items-center justify-center">
+          <div class="relative">
+            <img
+              src="/images/success-login.webp"
+              alt="step2"
+              class="h-52 w-72 object-cover"
+            />
+            <Icon
+              name="isotipo"
+              class="absolute top-1/2 left-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2"
+            />
+          </div>
+          <div class="space-x-2 py-6 text-center">
+            <h1 class="font-bold">{t.auth.welcomeHeadline}</h1>
+            <p class="text-sm">{t.auth.welcomeSubtitle}</p>
+          </div>
+          <a href={deepLink}>
+            <AppButton size label={t.auth.google.continueApp} />
+          </a>
+        </div>
+      )
+    }
+    <script type="module">
+      const urlParams = new URLSearchParams(window.location.search);
+      const platform = urlParams.get('platform');
+      const token = urlParams.get('token');
+
+      if (platform === 'WEB' && token) {
+        localStorage.setItem('googleLoginToken', token);
+        window.close();
+      }
+    </script>
+  </body>
+</html>

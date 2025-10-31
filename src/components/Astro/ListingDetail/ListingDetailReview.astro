@@ -1,0 +1,94 @@
+---
+import Modal from '@/components/Astro/Common/Modal.astro';
+import type { Review } from '@/types/listing/review';
+import { getSafeArray } from '@/utils/displayHelpers';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+import ListingDetailRating from './ListingDetailRating.astro';
+import type { Rating } from '@/types/listing/rating';
+import ListingReview from '@/components/React/Listing/ListingReview';
+import ReviewItem from '@/components/React/Common/ReviewItem';
+import AppButton from '../Common/AppButton.astro';
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+
+interface Props {
+  reviews: Review;
+  rating: Rating;
+  id: number;
+}
+const { reviews, rating, id }: Props = Astro.props;
+const safeReviews = getSafeArray(reviews.recentReviews);
+const firstSixReviews = safeReviews.slice(0, 6);
+---
+
+<div>
+  <div class="space-y-6 py-8">
+    <h1 class="title-listing">
+      {t.listingDetail.review.title}
+    </h1>
+    {
+      safeReviews.length === 0 ? (
+        <p>{t.listingDetail.review.noReviews}</p>
+      ) : (
+        <>
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {firstSixReviews.map((review) => (
+              <ReviewItem
+                client:visible
+                review={review}
+                truncateComment={true}
+                lang={lang}
+              />
+            ))}
+          </div>
+          {safeReviews.length > 4 && ( //Todo: change to 6 when more reviews are added
+            <AppButton
+              label={t.listingDetail.review.showAll}
+              modalId="reviews-modal"
+              outline={true}
+              icon="chevron-right"
+              color="secondary"
+              size="sm"
+            />
+          )}
+        </>
+      )
+    }
+  </div>
+  <Modal
+    id="reviews-modal"
+    showFooter={false}
+    showHeader={false}
+    maxWidth={'max-w-3xl'}
+    maxHeight={'max-h-[100vh]'}
+    maxHeightBody={'max-h-full lg:md:max-h-[90vh]'}
+    bgColor={'bg-[var(--color-base-150)]'}
+  >
+    <div slot="body">
+      <div class="grid grid-cols-7">
+        <div class="col-span-7 px-1 lg:col-span-3 lg:px-5">
+          <ListingDetailRating
+            rating={rating}
+            flex="flex flex-col lg:pr-5"
+            flexContent="flex lg:flex-col flex-nowrap overflow-x-auto whitespace-nowrap"
+            progresWidth="w-full"
+            scoreSize="text-6xl"
+            starSize="w-16 h-14"
+            description="text-xs py-1 text-neutral"
+            isModal={true}
+          />
+        </div>
+        <div class="col-span-7 px-1 lg:col-span-4">
+          <div class="flex flex-col gap-6">
+            <ListingReview
+              client:visible
+              numberReviews={reviews.totalReviews}
+              lang={lang}
+              id={id}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </Modal>
+</div>

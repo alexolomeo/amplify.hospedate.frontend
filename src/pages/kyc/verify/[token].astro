@@ -1,0 +1,55 @@
+---
+import VerificationScreen from '@/components/React/VerifyIdentity/VerificationScreen';
+import { validateSessionToken } from '@/services/verify-identity/kyc';
+import VerifyIdentityLayout from '@/layouts/VerifyIdentityLayout.astro';
+import { detectLanguage } from '@/utils/i18n';
+
+// Get session token from URL parameters
+const { token } = Astro.params;
+const url = new URL(Astro.request.url);
+const params = url.searchParams;
+const isApp = params.get('isApp') === 'true';
+const redirectUri = params.get('redirectUri');
+
+// Validate session token on server side - REQUIRED
+let isValidToken = false;
+let tokenError = '';
+
+if (!token) {
+  // No session token - redirect to 404 page
+  tokenError = 'Token not found. This link may have expired.';
+} else {
+  try {
+    console.log('Validating session token:', token);
+    // Validate token by making a server-side request using our service
+    const validation = await validateSessionToken(token);
+
+    isValidToken = validation.isValid && !validation.isExpired;
+    if (!isValidToken) {
+      tokenError = 'Invalid or expired session token';
+    }
+  } catch (error) {
+    console.error('Error validating session token:', error);
+    tokenError = 'Error validating session token';
+  }
+}
+
+// Redirect to profile if no valid token (server-side redirect)
+if (!isValidToken && tokenError) {
+  return Astro.redirect('/404');
+}
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+---
+
+<VerifyIdentityLayout title="Verificación de Identidad">
+  <div id="mobile-verification-container" class="h-full">
+    <VerificationScreen
+      client:load
+      sessionToken={token ?? undefined}
+      lang={lang}
+      isApp={isApp}
+      redirectUri={redirectUri ?? undefined}
+    />
+  </div>
+</VerifyIdentityLayout>

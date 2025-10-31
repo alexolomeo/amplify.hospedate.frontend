@@ -1,0 +1,175 @@
+---
+import ListingDetailDescription from '@/components/Astro/ListingDetail/ListingDetailDescription.astro';
+import ListingDetailAmenity from '@/components/Astro/ListingDetail/ListingDetailAmenity.astro';
+import ListingDetailReview from '@/components/Astro/ListingDetail/ListingDetailReview.astro';
+import { getSafeText } from '@/utils/displayHelpers';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+import { formatAddress } from '@/utils/formatAddress';
+import type { ListingDetail } from '@/types/listing/listing';
+import BookingContainer from '@/components/React/Listing/BookingContainer';
+import { GalleryContainer } from '@/components/React/Listing/GalleryContainer';
+import ListingDetailInfo from '../ListingDetail/ListingDetailInfo.astro';
+import ListingDetailRating from '../ListingDetail/ListingDetailRating.astro';
+import ListingDetailHost from '../ListingDetail/ListingDetailHost.astro';
+import ListingDetailMap from '../ListingDetail/ListingDetailMap.astro';
+import ListingDetailThingsToKnow from '../ListingDetail/ListingDetailThingsToKnow.astro';
+import Chevron from '/src/icons/chevron-left.svg?react';
+import Laptop from '/src/icons/amenities/tv.svg?react';
+import Mobile from '/src/icons/amenities/device-phone-mobile.svg?react';
+import PreviewResponsive from '../Common/preview/PreviewResponsive.astro';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+const { params } = Astro;
+
+interface Props {
+  listing: ListingDetail;
+}
+const { listing }: Props = Astro.props;
+const listingId = params.listingId ?? String(listing?.id ?? '');
+
+const url = new URL(Astro.request.url);
+const isMobileMode = url.searchParams.get('mode') === 'mobile';
+
+const laptopHref = new URL(url);
+laptopHref.searchParams.delete('mode');
+const mobileHref = new URL(url);
+mobileHref.searchParams.set('mode', 'mobile');
+
+const lapBtnClass = `btn btn-sm rounded-full ${isMobileMode ? 'bg-base-200' : 'btn-primary'}`;
+const mobBtnClass = `btn btn-sm rounded-full ${isMobileMode ? 'btn-primary' : 'bg-base-200'}`;
+---
+
+<div class="w-full bg-[var(--color-base-150)] pl-6">
+  <div
+    class="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-2 bg-[var(--color-base-150)] px-5 py-3"
+  >
+    {
+      listingId ? (
+        <a
+          href={`/hosting/listing/edit/${listingId}/title`}
+          role="button"
+          class="text-primary flex items-center gap-2 justify-self-start text-sm font-medium hover:underline"
+        >
+          <span class="text-xl leading-none">
+            <Chevron className="h-4" />
+          </span>
+          {t.auth.goBack}
+        </a>
+      ) : (
+        <button
+          type="button"
+          class="text-primary flex items-center gap-2 justify-self-start text-sm font-medium hover:underline"
+          onclick="history.back()"
+        >
+          <span class="text-xl leading-none">
+            <Chevron className="h-4" />
+          </span>
+          {t.auth.goBack}
+        </button>
+      )
+    }
+
+    <div
+      class="bg-base-200 flex items-center gap-2 justify-self-center rounded-full p-1 shadow-sm"
+    >
+      <a
+        href={laptopHref}
+        role="button"
+        aria-pressed={!isMobileMode}
+        class={lapBtnClass}
+        data-device="laptop"
+      >
+        {t.preview.laptop}
+        <Laptop className="h-4" />
+      </a>
+      <a
+        href={mobileHref}
+        role="button"
+        aria-pressed={isMobileMode}
+        class={mobBtnClass}
+        data-device="mobile"
+      >
+        {t.common.mobile}
+        <Mobile className="h-6" />
+      </a>
+    </div>
+
+    <div class="justify-self-end"></div>
+  </div>
+</div>
+
+{
+  !isMobileMode ? (
+    <div class="h-[100dvh] w-full overflow-hidden bg-[var(--color-base-150)]">
+      <div class="mx-auto mb-10 max-w-7xl px-10 py-10">
+        <div class="border-base-300 sticky top-20 overflow-hidden rounded-[32px] border bg-white shadow-sm">
+          <section
+            id="detail-scroll"
+            class="-mr-3 max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain px-6 py-8 pr-8 pb-24 [-ms-overflow-style:none] [scrollbar-width:none] sm:px-8 md:px-12 md:py-10 lg:px-14 [&::-webkit-scrollbar]:h-0 [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar-thumb]:bg-transparent [&::-webkit-scrollbar-track]:bg-transparent"
+          >
+            <div class="flex items-center justify-between py-6">
+              <h1 class="text-xl font-bold sm:text-2xl md:text-3xl lg:text-5xl">
+                {getSafeText(listing.title, lang)}
+              </h1>
+              <div class="flex space-x-2" />
+            </div>
+
+            <div id="mansory-container" />
+
+            <div class="grid grid-cols-1 gap-6 py-8 md:grid-cols-12">
+              <div class="md:col-span-7">
+                <ListingDetailInfo listing={listing} />
+                <ListingDetailDescription description={listing.description} />
+                <div id="sleeping-container" />
+                <ListingDetailAmenity amenities={listing.amenities} />
+                <div id="calendar-container" />
+              </div>
+
+              <div class="self-start py-6 md:col-span-5 md:py-8 md:pl-6">
+                <div id="booking-container" />
+              </div>
+            </div>
+
+            {listing.rating && <ListingDetailRating rating={listing.rating} />}
+            {listing.reviews && listing.rating && (
+              <ListingDetailReview
+                reviews={listing.reviews}
+                rating={listing.rating}
+                id={listing.id}
+              />
+            )}
+
+            <ListingDetailHost host={listing.host} />
+
+            <BookingContainer
+              client:only
+              id={listing.id}
+              city={listing.location.city}
+              petsAllowed={listing.houseRules.petsAllowed}
+              maxGuests={listing.placeInfo.guestNumber}
+              calendarSettings={listing.calendar}
+              houseRules={listing.houseRules}
+            />
+
+            <ListingDetailThingsToKnow
+              houseRules={listing.houseRules}
+              safetyProperty={listing.safetyProperty}
+            />
+            <ListingDetailMap
+              address={formatAddress(listing)}
+              coordinates={listing.location.coordinates}
+              showSpecificLocation={listing.showSpecificLocation}
+            />
+
+            <p class="mb-24" />
+
+            <GalleryContainer client:load spaces={listing.spaces} lang={lang} />
+          </section>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <PreviewResponsive listing={listing} />
+  )
+}

@@ -1,0 +1,25 @@
+---
+import ProtectedLayout from '@/layouts/ProtectedLayout.astro';
+import MessagesContainer from '../../../components/React/Messages/MessagesContainer';
+import { detectLanguage, getTranslation } from '../../../utils/i18n';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+const title = t.userProfile.messages;
+
+const { conversationId } = Astro.params;
+---
+
+<ProtectedLayout title={title} showFooter={false}>
+  <section class="mx-auto flex w-full flex-1 md:px-4 lg:px-8">
+    <div class="flex w-full overflow-hidden bg-white">
+      <main class="flex w-full flex-1 flex-col">
+        <MessagesContainer
+          lang={lang}
+          initialConversationId={conversationId}
+          client:load
+        />
+      </main>
+    </div>
+  </section>
+</ProtectedLayout>

@@ -1,0 +1,45 @@
+---
+import CreateListingLayout from '@/layouts/CreateListingLayout.astro';
+import CreateListingWrapper from '@/components/React/CreateListing/CreateListingWrapper';
+import { detectLanguage, getTranslation, translate } from '@/utils/i18n';
+import { SLUG_TO_STEP } from '@/components/React/Utils/create-listing.step-slugs';
+
+const { path } = Astro.params;
+const segments = path?.split('/') ?? [];
+
+let listingId = undefined;
+let stepSlug = undefined;
+
+if (segments.length === 1) {
+  if (!Number.isNaN(Number.parseInt(segments[0], 10))) {
+    listingId = segments[0];
+    stepSlug = undefined;
+  } else {
+    listingId = undefined;
+    stepSlug = segments[0];
+  }
+} else if (segments.length === 2) {
+  listingId = segments[0];
+  stepSlug = segments[1];
+} else {
+  return Astro.redirect('/listing/create/overview');
+}
+
+if (stepSlug && SLUG_TO_STEP[stepSlug] === undefined) {
+  return Astro.redirect('/listing/create/overview');
+}
+
+const url = new URL(Astro.request.url);
+const lang = detectLanguage(Astro.request.headers, url);
+const t = getTranslation(lang);
+const pageTitle = translate(t, 'createListing.wizardHeader.title');
+---
+
+<CreateListingLayout title={pageTitle} lang={lang}>
+  <CreateListingWrapper
+    client:only="react"
+    lang={lang}
+    listingId={listingId}
+    stepSlug={stepSlug}
+  />
+</CreateListingLayout>

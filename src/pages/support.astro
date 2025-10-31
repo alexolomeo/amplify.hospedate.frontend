@@ -1,0 +1,12 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+import SupportComponent from '@/components/Astro/Support.astro';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+---
+
+<MainLayout title={t.supportPage.pageTitle}>
+  <SupportComponent lang={lang} />
+</MainLayout>

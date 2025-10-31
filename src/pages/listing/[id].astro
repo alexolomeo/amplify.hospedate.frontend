@@ -1,0 +1,18 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+import { fetchListingById } from '../../services/listings.ts';
+import ListingDetail from '@/components/Astro/ListingDetail/ListingDetail.astro';
+import { type ListingDetail as ListingDetailType } from '@/types/listing/listing.ts';
+
+const { params } = Astro;
+const listing: ListingDetailType | null = await fetchListingById(
+  Number(params.id)
+);
+if (!listing) {
+  return new Response(null, { status: 404 });
+}
+---
+
+<MainLayout title={listing.title} isActions={true} isCompactSearch={true}>
+  <ListingDetail listing={listing} />
+</MainLayout>

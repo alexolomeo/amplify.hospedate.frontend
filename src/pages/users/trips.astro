@@ -1,0 +1,25 @@
+---
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+import TripsPanel from '@/components/React/Trips/TripsPanel';
+import ProtectedLayout from '@/layouts/ProtectedLayout.astro';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+const title = t.trips.pageTitle;
+---
+
+<ProtectedLayout title={title}>
+  <div
+    class="flex flex-col gap-12 bg-white px-4 pt-8 pb-24 sm:px-6 sm:pt-10 md:px-12 md:pt-12 xl:px-[140px]"
+  >
+    <div class="flex flex-col gap-10">
+      <div class="flex min-w-0 flex-1 flex-col gap-2">
+        {/* Title */}
+        <div class="flex items-center text-xl leading-8 font-bold sm:text-2xl">
+          {t.trips.pageTitle}
+        </div>
+      </div>
+    </div>
+    <TripsPanel client:idle lang={lang} t={t} />
+  </div>
+</ProtectedLayout>

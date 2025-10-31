@@ -1,0 +1,34 @@
+---
+import EditListingLayout from '@/layouts/EditListingLayout.astro';
+import EditListingWrapper from '@/components/React/Host/EditListing/EditListingWrapper';
+import { detectLanguage } from '@/utils/i18n';
+import ListingDetailPage from '@/components/React/Host/PreviewListing/ListingDetailPage';
+
+const { params, request } = Astro;
+const lang = detectLanguage(request.headers, new URL(request.url));
+const listingId = params.listingId || '123';
+
+let stepSlug: string;
+if (Array.isArray(params.step)) stepSlug = params.step[0] || 'overview';
+else if (typeof params.step === 'string') stepSlug = params.step || 'overview';
+else stepSlug = 'overview';
+
+const isPreview = stepSlug === 'preview';
+---
+
+{
+  isPreview ? (
+    <EditListingLayout title="Vista previa" isHosting={true}>
+      <ListingDetailPage client:idle lang={lang} listingIdRecived={listingId} />
+    </EditListingLayout>
+  ) : (
+    <EditListingLayout title="Editar alojamiento" isHosting={true}>
+      <EditListingWrapper
+        client:idle
+        lang={lang}
+        listingId={listingId}
+        stepSlug={stepSlug}
+      />
+    </EditListingLayout>
+  )
+}

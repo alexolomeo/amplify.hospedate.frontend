@@ -1,0 +1,49 @@
+---
+import { iconExists } from '@/utils/iconUtils';
+import type { Amenity } from '@/types/listing/amenity';
+import { Icon } from 'astro-icon/components';
+import { translateAmenity } from '@/utils/translateAmenity';
+import { getTranslation, translate } from '@/utils/i18n';
+import { type SupportedLanguages } from '@/utils/i18n';
+
+interface Props {
+  amenities: Amenity[];
+  lang?: SupportedLanguages;
+}
+const { amenities, lang = 'es' } = Astro.props;
+const t = getTranslation(lang);
+
+const groups: Record<string, Amenity[]> = {};
+amenities.forEach((amenity) => {
+  const group = amenity.amenityGroup;
+  groups[group] ??= [];
+  groups[group].push(amenity);
+});
+const groupNames = Object.keys(groups).sort();
+---
+
+<div class="px-2">
+  {
+    groupNames.map((groupName) => (
+      <div class="mb-4">
+        <h3 class="py-3 text-lg font-semibold tracking-wide">
+          {translate(t, `amenityGroups.${groupName}`)}
+        </h3>
+        <ul>
+          {groups[groupName].map((item) => {
+            const iconPath = `amenities/${item.icon}`;
+            const iconName = iconExists(iconPath) ? iconPath : 'news';
+            return (
+              <li class="mb-2 flex items-center gap-3 sm:mb-3">
+                <Icon name={iconName} class="text-secondary h-4 w-4" />
+                <p class="flex-1 justify-center text-sm leading-tight font-normal">
+                  {translateAmenity(item.icon, t)}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    ))
+  }
+</div>

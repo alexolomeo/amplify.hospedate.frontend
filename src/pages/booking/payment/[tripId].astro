@@ -1,0 +1,22 @@
+---
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+import PaymentGateway from '@/components/React/Booking/PaymentGateway';
+import ProtectedLayout from '@/layouts/ProtectedLayout.astro';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+const title = t.booking.pageTitles.dashboard;
+const { tripId } = Astro.params;
+
+if (!tripId) {
+  return new Response(null, { status: 404 });
+}
+---
+
+<ProtectedLayout title={title} requires={{ registerCompleted: true }}>
+  <div
+    class="mx-auto max-w-4xl px-5 pt-6 pb-22 lg:max-w-4xl xl:max-w-6xl 2xl:max-w-7xl"
+  >
+    <PaymentGateway client:idle lang={lang} tripId={tripId} />
+  </div>
+</ProtectedLayout>

@@ -1,0 +1,42 @@
+---
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+import { Icon } from 'astro-icon/components';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+---
+
+<div class="dropdown dropdown-center cursor-pointer">
+  <!-- Button -->
+  <div
+    tabindex="0"
+    role="button"
+    class="flex h-12 w-12 items-center justify-center rounded-[16px] bg-[var(--color-base-150)]"
+  >
+    <Icon name="language" class="h-4 w-4 text-[var(--color-base-content)]" />
+  </div>
+
+  <!-- Menu -->
+  <ul
+    tabindex="0"
+    class="dropdown-content menu-sm space z-[1] mt-3 w-auto rounded-4xl bg-[var(--color-base-150)] px-6 py-4 shadow-md"
+  >
+    <li class="text-start text-lg font-bold">{t.userProfile.changeLanguage}</li>
+    <li class="flex items-center justify-center gap-x-2 py-4">
+      <a
+        href="/?lang=es"
+        class="outline-primary hover:bg-base-100 w-25 px-2 py-3 outline"
+      >
+        <p class="text-sm">Español</p>
+        <p class="text-neutral text-xs">Español</p>
+      </a>
+      <a
+        href="/?lang=en"
+        class="outline-primary hover:bg-base-100 w-25 px-2 py-3 outline"
+      >
+        <p class="text-sm">English</p>
+        <p class="text-neutral text-xs">Inglés</p>
+      </a>
+    </li>
+  </ul>
+</div>

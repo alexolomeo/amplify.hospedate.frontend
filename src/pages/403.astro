@@ -1,0 +1,26 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+---
+
+<MainLayout title={t.forbiddenPage.title}>
+  <div class="space-y-6 py-20 text-center">
+    <h1 class="text-primary text-xl font-bold">
+      {t.forbiddenPage.heading}
+    </h1>
+    <div class="flex justify-center">
+      <img src="/images/pages/403.webp" alt="403 Forbidden" class="h-60 w-60" />
+    </div>
+    <div class="flex justify-center">
+      <p class="max-w-xl text-2xl font-normal lg:text-4xl">
+        {t.forbiddenPage.description}
+      </p>
+    </div>
+    <a href="/" class="btn btn-primary rounded-full py-4">
+      {t.forbiddenPage.backToHome}
+    </a>
+  </div>
+</MainLayout>

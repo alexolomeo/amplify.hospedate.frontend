@@ -1,0 +1,49 @@
+---
+import { Icon } from 'astro-icon/components';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+
+const currentPath = Astro.url.pathname;
+const menuItems = [
+  {
+    href: '/hosting/reservations',
+    label: t.menu.reservations,
+  },
+  { href: '/hosting/earnings', label: t.menu.earnings },
+  { href: '/hosting/reviews', label: t.menu.reviews },
+  { href: '/hosting/messages', label: t.menu.messages },
+];
+---
+
+<div class="dropdown dropdown-center">
+  <div
+    tabindex={0}
+    role="button"
+    class="flex cursor-pointer items-center gap-2 text-sm font-normal md:h-12 md:px-3"
+  >
+    {t.menu.menu}
+    <Icon name="chevron-down" class="h-5" size={20} />
+  </div>
+
+  <ul
+    tabindex={0}
+    class="menu dropdown-content menu-sm rounded-box z-[1] mt-3 w-52 bg-[var(--color-base-150)] p-3 shadow-md"
+  >
+    {
+      menuItems.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class={`hover:bg-base-200 text-sm hover:rounded-full ${
+              currentPath === item.href ? 'font-semibold' : ''
+            }`}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>

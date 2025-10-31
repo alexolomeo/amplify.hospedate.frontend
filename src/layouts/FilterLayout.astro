@@ -1,0 +1,96 @@
+---
+import '../styles/global.css';
+
+import { ClientRouter } from 'astro:transitions';
+import Footer from '@/components/Astro/Footer.astro';
+import { detectLanguage } from '@/utils/i18n';
+import HeaderFilter from '@/components/Astro/HeaderFilter.astro';
+import AuthContainer from '@/components/React/Auth/AuthContainer';
+import GlobalToastProvider from '@/components/ui/GlobalToastProvider';
+import GlobalFCMProvider from '@/components/ui/FCMProvider';
+import TimezoneBootstrap from '@/components/React/Utils/TimezoneBootstrap';
+
+const headers = Astro.request.headers;
+const url = new URL(Astro.request.url);
+const lang = detectLanguage(headers, url);
+
+// Check if we need to set a language cookie
+if (url.searchParams.get('lang')) {
+  Astro.response.headers.set(
+    'Set-Cookie',
+    `lang=${lang}; Path=/; HttpOnly; SameSite=Lax;`
+  );
+}
+
+interface Props {
+  title: string;
+  showFooter?: boolean;
+}
+
+const { title, showFooter = true } = Astro.props;
+---
+
+<html lang={lang} class="h-full" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Performance optimizations -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://www.gstatic.com" />
+
+    <!-- Preload critical fonts - Optimized: only weights 400,600,700,800 with subset -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap&subset=latin"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap&subset=latin"
+        rel="stylesheet"
+      />
+    </noscript>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      sizes="16x16"
+      href="/favicon-16x16.svg"
+    />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <ClientRouter />
+    <title>{title}</title>
+  </head>
+  <body class="bg-base-100 flex min-h-screen flex-col">
+    <HeaderFilter />
+    <main class="flex flex-1 flex-col">
+      <slot />
+    </main>
+    {showFooter && <Footer />}
+    <AuthContainer client:idle lang={lang} />
+    <GlobalToastProvider client:idle />
+    <GlobalFCMProvider client:idle lang={lang} />
+    <TimezoneBootstrap client:idle />
+    <script>
+      import { sessionService } from '@/services/SessionService';
+      import { AuthEventEmitter } from '@/utils/authEventEmitter';
+      sessionService.initClient();
+      const go = (path: string) => {
+        if (window.location.pathname !== path) window.location.assign(path);
+      };
+
+      AuthEventEmitter.on('route.forbidden', () => go('/403'));
+      AuthEventEmitter.on('route.notfound', () => go('/404'));
+      AuthEventEmitter.on('auth.unrecoverable', () => go('/500'));
+    </script>
+    <slot name="scripts" />
+  </body>
+</html>

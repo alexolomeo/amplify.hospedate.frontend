@@ -1,0 +1,41 @@
+---
+import { Icon } from 'astro-icon/components';
+
+const {
+  label = '',
+  icon = null,
+  onClick,
+  type = 'button',
+  className = '',
+  variant = 'default',
+  size = 'sm',
+  rounded = true,
+  outline = false,
+  fontSemibold = false,
+  modalId = '',
+  color = 'primary',
+  colorText = 'primary',
+} = Astro.props;
+
+let baseClass = '';
+if (variant === 'default') {
+  baseClass = `btn btn-${color} ${outline ? 'btn-outline' : ''} btn-${size}`;
+  if (rounded) baseClass += ' rounded-full';
+  if (fontSemibold) baseClass += ' font-semibold';
+} else if (variant === 'link') {
+  baseClass = `text-${colorText} flex cursor-pointer items-center underline underline-offset-2 gap-x-1 text-${size}`;
+} else if (variant === 'circle') {
+  baseClass = `btn btn-${color} btn-${size} btn-circle btn-soft`;
+}
+---
+
+<button
+  type={type}
+  class={`${baseClass} ${className}`}
+  onclick={modalId
+    ? `document.getElementById('${modalId}').showModal()`
+    : onClick}
+>
+  {label}
+  {icon && <Icon name={icon} class="h-4" size={20} />}
+</button>

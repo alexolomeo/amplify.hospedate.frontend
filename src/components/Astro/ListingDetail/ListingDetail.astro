@@ -1,0 +1,100 @@
+---
+import ListingDetailDescription from '@/components/Astro/ListingDetail/ListingDetailDescription.astro';
+import ListingDetailAmenity from '@/components/Astro/ListingDetail/ListingDetailAmenity.astro';
+import ListingDetailReview from '@/components/Astro/ListingDetail/ListingDetailReview.astro';
+import ListingDetailMap from './ListingDetailMap.astro';
+import { getSafeText } from '@/utils/displayHelpers';
+import { detectLanguage } from '@/utils/i18n';
+import { formatAddress } from '@/utils/formatAddress';
+import type { ListingDetail } from '@/types/listing/listing';
+import BookingContainer from '@/components/React/Listing/BookingContainer';
+import ListingDetailRating from './ListingDetailRating.astro';
+import ListingDetailThingsToKnow from './ListingDetailThingsToKnow.astro';
+import ListingDetailHost from './ListingDetailHost.astro';
+import ListingDetailInfo from './ListingDetailInfo.astro';
+import { GalleryContainer } from '@/components/React/Listing/GalleryContainer';
+import ListingMasonrySkeleton from './ListingMasonrySkeleton.astro';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+interface Props {
+  listing: ListingDetail;
+}
+const { listing }: Props = Astro.props;
+---
+
+<section
+  class="mx-auto max-w-4xl px-5 pt-6 pb-22 lg:max-w-4xl xl:max-w-6xl 2xl:max-w-7xl"
+>
+  <div class="flex items-center justify-between py-10">
+    <div id="title-root" class="flex-1">
+      <h1
+        class="h1-real text-xl font-bold break-all sm:text-2xl md:text-3xl lg:text-5xl"
+      >
+        {getSafeText(listing.title, lang)}
+      </h1>
+    </div>
+    <div class="flex space-x-2"></div>
+  </div>
+
+  <!-- Reserve space for masonry to prevent layout shift -->
+  <!-- Server-side skeleton - visible immediately, replaced when React hydrates -->
+  <div id="mansory-container" style="contain: layout;">
+    <ListingMasonrySkeleton />
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 py-8 md:grid-cols-10 md:py-10">
+    <!-- COLUMN1 -->
+    <div class="col-span-1 md:col-span-6">
+      <div id="info-root">
+        <ListingDetailInfo listing={listing} />
+      </div>
+
+      <ListingDetailDescription description={listing.description} />
+      <div id="sleeping-container"></div>
+      <ListingDetailAmenity amenities={listing.amenities} />
+      <div id="calendar-container"></div>
+    </div>
+
+    <!-- COLUMN2 -->
+    <div class="sticky top-20 self-start py-8 md:col-span-4">
+      <div id="booking-container"></div>
+    </div>
+  </div>
+
+  {listing.rating && <ListingDetailRating rating={listing.rating} />}
+
+  {
+    listing.reviews && listing.rating && (
+      <ListingDetailReview
+        reviews={listing.reviews}
+        rating={listing.rating}
+        id={listing.id}
+      />
+    )
+  }
+
+  <GalleryContainer client:idle spaces={listing.spaces} lang={lang} />
+
+  <ListingDetailHost host={listing.host} listingId={listing.id} />
+
+  <BookingContainer
+    client:only="react"
+    id={listing.id}
+    city={listing.location.city}
+    petsAllowed={listing.houseRules.petsAllowed}
+    maxGuests={listing.placeInfo.guestNumber}
+    calendarSettings={listing.calendar}
+    houseRules={listing.houseRules}
+  />
+
+  <ListingDetailMap
+    address={formatAddress(listing)}
+    coordinates={listing.location.coordinates}
+    showSpecificLocation={listing.showSpecificLocation}
+  />
+
+  <ListingDetailThingsToKnow
+    houseRules={listing.houseRules}
+    safetyProperty={listing.safetyProperty}
+  />
+</section>

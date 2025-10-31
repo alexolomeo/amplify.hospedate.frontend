@@ -1,0 +1,11 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<label class="flex cursor-pointer items-center justify-center gap-2">
+  <Icon name="day" class="h-5 w-5" />
+  <input id="theme-toggle" type="checkbox" class="toggle toggle-primary" />
+  <Icon name="night" class="h-5 w-5" />
+</label>
+
+<script src="../../scripts/themeSelector.ts"></script>

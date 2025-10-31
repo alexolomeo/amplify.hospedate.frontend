@@ -1,0 +1,77 @@
+---
+import AvatarDisplay from '@/components/React/Common/AvatarDisplay';
+import StarRating from '@/components/React/Common/StarRating';
+import { getSafeText } from '@/utils/displayHelpers';
+import { formatAddress } from '@/utils/formatAddress';
+import { detectLanguage, getTranslation, translatePlural } from '@/utils/i18n';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+const { listing } = Astro.props;
+const capacityItems = [
+  { key: 'guest', value: listing.placeInfo.guestNumber },
+  { key: 'room', value: listing.placeInfo.roomNumber },
+  { key: 'bed', value: listing.placeInfo.bedNumber },
+  { key: 'bathroom', value: listing.placeInfo.bathNumber },
+];
+---
+
+<div>
+  <div class="py-8">
+    <h2 class="title-listing">
+      {getSafeText(formatAddress(listing), lang)}
+    </h2>
+    <div
+      class="inline-flex items-center justify-start gap-2 self-stretch lg:gap-4"
+    >
+      {
+        capacityItems.map((item, index) => (
+          <>
+            <span class="text-neutral justify-center text-xs leading-7 font-normal md:text-sm lg:text-sm">
+              {translatePlural(
+                t,
+                `listingDetail.capacity.${item.key}`,
+                item.value
+              )}
+            </span>
+            {index < capacityItems.length - 1 && (
+              <span class="text-neutral text-xs">●</span>
+            )}
+          </>
+        ))
+      }
+    </div>
+  </div>
+  <!-- Host -->
+  <div class="flex items-center gap-4 py-8">
+    <div class="avatar">
+      <a
+        class="flex h-24 w-24 cursor-pointer"
+        href={`/users/${listing.host.id}`}
+        aria-label="View host profile"
+        tabindex="0"
+      >
+        <AvatarDisplay
+          client:visible
+          profilePicture={listing.host.profilePicture}
+          username={listing.host.username}
+          size="h-24 w-24"
+          sizeText="text-4xl"
+        />
+      </a>
+    </div>
+    <div class="flex flex-col justify-center">
+      <span class="text-xs">{t.listingDetail.host.title}</span>
+      <span class="text-lg font-semibold"
+        >{getSafeText(listing.host.username, lang)}</span
+      >
+      <div class="flex items-center gap-2">
+        {
+          listing.host.score > 0 && (
+            <StarRating rating={listing.host.score} size="w-6 h-6" />
+          )
+        }
+      </div>
+    </div>
+  </div>
+</div>

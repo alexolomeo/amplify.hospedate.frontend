@@ -1,0 +1,35 @@
+---
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+import { Icon } from 'astro-icon/components';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+---
+
+<div class="dropdown dropdown-end">
+  <div tabindex="0" role="button" class="btn btn-ghost">
+    <Icon name="notification" class="h-4 w-4" />
+  </div>
+  <ul
+    tabindex="0"
+    class="dropdown-content rounded-box bg-base-100 z-[1] mt-3 w-96 p-2 shadow"
+  >
+    <li class="m-5">
+      <h1 class="font-bold">{t.notifications}</h1>
+    </li>
+    <li class="flex gap-x-2 px-2">
+      <div>
+        <Icon name="logo" class="h-10 w-10" />
+      </div>
+      <div>
+        <span class="text-sm font-semibold"
+          >Confirma tu dirección de correo electrónico haciendo clic en el
+          enlace que te enviamos. Si no lo encuentras, puedes solicitar una
+          nueva confirmación por correo electrónico o cambiar tu dirección.</span
+        >
+        <br />
+        <span class="text-xs font-semibold opacity-60">Hace 2 días</span>
+      </div>
+    </li>
+  </ul>
+</div>

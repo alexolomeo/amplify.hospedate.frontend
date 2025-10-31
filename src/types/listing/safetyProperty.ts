@@ -1,0 +1,38 @@
+export interface SafetyProperty {
+  carbonMonoxideDetector: boolean;
+  carbonMonoxideDetectorDetails?: null | string;
+  expectationAnimals?: boolean | null;
+  expectationAnimalsDetails?: null | string;
+  expectationClimbingOrPlayStructure?: boolean | null;
+  expectationClimbingOrPlayStructureDetails?: null | string;
+  expectationHasPets?: boolean | null;
+  expectationHasPetsDetails?: null | string;
+  expectationHeightsWithNoFence?: boolean | null;
+  expectationHeightsWithNoFenceDetails?: null | string;
+  expectationLakeOrRiverOrWaterBody?: boolean | null;
+  expectationLakeOrRiverOrWaterBodyDetails?: null | string;
+  expectationLimitedParking?: boolean | null;
+  expectationLimitedParkingDetails?: null | string;
+  expectationNoiseMonitor?: boolean | null;
+  expectationNoiseMonitorDetails?: null | string;
+  expectationPoolOrJacuzziWithNoFence?: boolean | null;
+  expectationPoolOrJacuzziWithNoFenceDetails?: null | string;
+  expectationPotencialNoise?: boolean | null;
+  expectationPotencialNoiseDetails?: null | string;
+  expectationRequireStairs?: boolean | null;
+  expectationRequireStairsDetails?: null | string;
+  expectationSharedSpaces?: boolean | null;
+  expectationSharedSpacesDetails?: null | string;
+  expectationSurveillance?: boolean | null;
+  expectationSurveillanceDetails?: null | string;
+  expectationWeapons?: boolean | null;
+  expectationWeaponsDetails?: null | string;
+  expectedLimitedAmenities?: boolean | null;
+  expectedLimitedAmenitiesDetails?: null | string;
+  noChildrenAllowed?: boolean | null;
+  noChildrenAllowedDetails?: null | string;
+  noInfantsAllowed?: boolean | null;
+  noInfantsAllowedDetails?: null | string;
+  smokeDetector: boolean;
+  smokeDetectorDetails?: null | string;
+}

@@ -1,0 +1,13 @@
+---
+import LoginPrivacyPage from '@/components/React/Wrappers/RegisteredPages/LoginPrivacyPage';
+import ProtectedLayout from '@/layouts/ProtectedLayout.astro';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+const title = t.users.loginAndPrivacyTitle;
+---
+
+<ProtectedLayout title={title} isActions={true}>
+  <LoginPrivacyPage client:idle lang={lang} t={t} />
+</ProtectedLayout>

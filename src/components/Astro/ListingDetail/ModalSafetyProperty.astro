@@ -1,0 +1,241 @@
+---
+import type { SafetyProperty } from '@/types/listing/safetyProperty';
+import { detectLanguage, getTranslation, translate } from '@/utils/i18n';
+import { Icon } from 'astro-icon/components';
+import Modal from '../Common/Modal.astro';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+
+interface Props {
+  safetyProperty: SafetyProperty;
+}
+
+interface SafetyPropertyItem {
+  label: string;
+  icon: string;
+  description?: string | boolean | null | undefined;
+}
+
+interface SafetyPropertySection {
+  title: string;
+  items: SafetyPropertyItem[];
+}
+
+const { safetyProperty }: Props = Astro.props;
+const basePath = 'listingDetail.thingsToKnow.safetyProperty';
+
+const makeItem = (
+  label: string,
+  icon: string,
+  description?: string | boolean | undefined
+) => ({
+  label,
+  icon,
+  description,
+});
+
+const safetyConsiderationsConfig: {
+  key: keyof SafetyProperty;
+  required: boolean;
+  icon: string;
+}[] = [
+  {
+    key: 'expectationClimbingOrPlayStructure',
+    required: false,
+    icon: 'safety-property/expectation-climbing-or-play-structure',
+  },
+  {
+    key: 'expectationHeightsWithNoFence',
+    required: false,
+    icon: 'safety-property/expectation-heights-with-no-fence',
+  },
+  {
+    key: 'expectationLakeOrRiverOrWaterBody',
+    required: false,
+    icon: 'safety-property/expectation-lake-or-river-or-water-body',
+  },
+  {
+    key: 'expectationPoolOrJacuzziWithNoFence',
+    required: false,
+    icon: 'safety-property/expectation-pool-or-jacuzzi-with-no-fence',
+  },
+  {
+    key: 'noChildrenAllowed',
+    required: false,
+    icon: 'safety-property/no-children-allowed',
+  },
+  {
+    key: 'noInfantsAllowed',
+    required: false,
+    icon: 'safety-property/no-infants-allowed',
+  },
+];
+
+const safetyDevicesConfig: {
+  key: keyof SafetyProperty;
+  required: boolean;
+  icon: string;
+}[] = [
+  {
+    key: 'carbonMonoxideDetector',
+    required: true,
+    icon: 'safety-property/carbon-monoxide-detector',
+  },
+  {
+    key: 'smokeDetector',
+    required: true,
+    icon: 'safety-property/smoke-detector',
+  },
+  {
+    key: 'expectationSurveillance',
+    required: false,
+    icon: 'safety-property/expectation-surveillance',
+  },
+  {
+    key: 'expectationNoiseMonitor',
+    required: false,
+    icon: 'safety-property/expectation-noise-monitor',
+  },
+];
+
+const propertyInformationConfig: {
+  key: keyof SafetyProperty;
+  required: boolean;
+  icon: string;
+}[] = [
+  {
+    key: 'expectationHasPets',
+    required: false,
+    icon: 'safety-property/expectation-has-pets',
+  },
+  {
+    key: 'expectationAnimals',
+    required: false,
+    icon: 'safety-property/expectation-animals',
+  },
+  {
+    key: 'expectationWeapons',
+    required: false,
+    icon: 'safety-property/expectation-weapons',
+  },
+  {
+    key: 'expectationRequireStairs',
+    required: false,
+    icon: 'safety-property/expectation-require-stairs',
+  },
+  {
+    key: 'expectationSharedSpaces',
+    required: false,
+    icon: 'safety-property/expectation-shared-spaces',
+  },
+  {
+    key: 'expectedLimitedAmenities',
+    required: false,
+    icon: 'safety-property/expected-limited-amenities',
+  },
+  {
+    key: 'expectationPotencialNoise',
+    required: false,
+    icon: 'safety-property/expectation-potencial-noise',
+  },
+  {
+    key: 'expectationLimitedParking',
+    required: false,
+    icon: 'safety-property/expectation-limited-parking',
+  },
+];
+
+const processItems = (
+  config: { key: keyof SafetyProperty; required: boolean; icon: string }[],
+  section: string
+): SafetyPropertyItem[] => {
+  return config.reduce(
+    (items: SafetyPropertyItem[], { key, required, icon }) => {
+      const value = safetyProperty[key];
+      if (required || value === true) {
+        let label = translate(t, `${basePath}.${section}.${key}`);
+        const descriptionKey = `${key}Details` as keyof SafetyProperty;
+        const description = safetyProperty[descriptionKey] ?? undefined;
+        if (required) {
+          const keyStatus = value === true ? 'yes' : 'no';
+          const dynamicKey = `${basePath}.${section}.${key}.${keyStatus}`;
+          label = translate(t, dynamicKey);
+          icon = value === true ? icon : `${icon}-disabled`;
+        }
+        items.push(makeItem(label, icon, description));
+      }
+      return items;
+    },
+    []
+  );
+};
+const safetyConsiderationsItems = processItems(
+  safetyConsiderationsConfig,
+  'safetyConsiderations'
+);
+const safetyDevicesItems = processItems(safetyDevicesConfig, 'safetyDevices');
+const propertyInformationItems = processItems(
+  propertyInformationConfig,
+  'propertyInformation'
+);
+
+const safetyPropertySections: SafetyPropertySection[] = [
+  {
+    title: translate(t, `${basePath}.safetyConsiderations.title`),
+    items: safetyConsiderationsItems,
+  },
+  {
+    title: translate(t, `${basePath}.safetyDevices.title`),
+    items: safetyDevicesItems,
+  },
+  {
+    title: translate(t, `${basePath}.propertyInformation.title`),
+    items: propertyInformationItems,
+  },
+];
+---
+
+<div>
+  <Modal
+    id="safety-property"
+    showFooter={false}
+    showHeader={true}
+    title={t.listingDetail.thingsToKnow.safetyProperty.title}
+    maxWidth={'max-w-2xl'}
+    maxHeight={'max-h-[90vh]'}
+    bgColor={'bg-[var(--color-base-150)]'}
+  >
+    <div slot="body">
+      <div class="flex flex-col gap-3">
+        <p
+          class="my-3 justify-center self-stretch text-sm leading-normal font-normal"
+        >
+          {t.listingDetail.thingsToKnow.safetyProperty.description}
+        </p>
+        {
+          safetyPropertySections.map((section) => (
+            <div>
+              {section.items.length > 0 && (
+                <p class="self-stretch text-xl leading-loose font-semibold">
+                  {section.title}
+                </p>
+              )}
+              {section.items.map((item) => (
+                <div class="flex items-center justify-start gap-3 self-stretch py-3">
+                  <Icon name={item.icon} class="text-secondary h-5" size={20} />
+                  <div class="inline-flex flex-1 flex-col items-start justify-center pr-2">
+                    <span class="text-sm font-medium">{item.label}</span>
+                    {item.description && (
+                      <p class="text-xs text-gray-500">{item.description}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </Modal>
+</div>

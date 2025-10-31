@@ -1,0 +1,67 @@
+---
+import ProtectedGate from '@/components/React/Auth/ProtectedGate';
+import type { PolicyReqs } from '@/policies/authPolicy';
+import '@/styles/global.css';
+import GlobalToastProvider from '@/components/ui/GlobalToastProvider';
+import GlobalFCMProvider from '@/components/ui/FCMProvider';
+import TimezoneBootstrap from '@/components/React/Utils/TimezoneBootstrap';
+
+interface Props {
+  title: string;
+  lang?: 'es' | 'en';
+  requires?: PolicyReqs;
+}
+
+const { title, lang = 'es', requires = {} } = Astro.props;
+---
+
+<html class="hide-scrollbar h-full" lang={lang} data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      sizes="16x16"
+      href="/favicon-16x16.svg"
+    />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <title>{title}</title>
+  </head>
+  <body class="flex h-full flex-col">
+    <div id="protected-fallback" class="p-6"></div>
+    <div id="protected-content" style="display:none">
+      <slot />
+    </div>
+
+    <!-- Gate: fuerza refresh + userMe + policy; redirige si falla -->
+    <ProtectedGate
+      client:load
+      requires={requires}
+      fallbackId="protected-fallback"
+      contentId="protected-content"
+    />
+
+    <script>
+      import { sessionService } from '@/services/SessionService';
+      import { AuthEventEmitter } from '@/utils/authEventEmitter';
+      sessionService.initClient();
+      const go = (path: string) => {
+        if (window.location.pathname !== path) window.location.assign(path);
+      };
+
+      AuthEventEmitter.on('route.forbidden', () => go('/403'));
+      AuthEventEmitter.on('route.notfound', () => go('/404'));
+      AuthEventEmitter.on('auth.unrecoverable', () => go('/500'));
+    </script>
+
+    <GlobalToastProvider client:idle />
+    <GlobalFCMProvider client:idle lang={lang} />
+    <TimezoneBootstrap client:idle />
+  </body>
+</html>

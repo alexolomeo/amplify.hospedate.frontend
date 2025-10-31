@@ -1,0 +1,53 @@
+---
+import GoogleMap from '@/components/React/Common/GoogleMap';
+import type { Coordinates } from '@/types/listing/location';
+import { getSafeText } from '@/utils/displayHelpers';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+interface Props {
+  address: string;
+  coordinates: Coordinates;
+  showSpecificLocation?: boolean;
+}
+const { address, coordinates, showSpecificLocation }: Props = Astro.props;
+const { latitude, longitude } = coordinates;
+const showMarker =
+  typeof latitude === 'number' &&
+  typeof longitude === 'number' &&
+  latitude !== 0 &&
+  longitude !== 0;
+const showApproximateMarker = showMarker && !showSpecificLocation;
+const markerLabel =
+  showMarker && !showSpecificLocation
+    ? t.listingDetail.map.exactLocationAfterReservation
+    : undefined;
+---
+
+<div class="py-8">
+  <h2 class="title-listing">
+    {t.listingDetail.map.title}
+  </h2>
+  {
+    showMarker ? (
+      <div class="space-y-6">
+        <p class="description-listing">{getSafeText(address, lang)}</p>
+        <GoogleMap
+          latitude={latitude}
+          longitude={longitude}
+          zoom={14}
+          showMarker={showMarker}
+          showRoundedMarker={showApproximateMarker}
+          {...(markerLabel && { markerLabel })}
+          client:visible
+          widthClass="w-full"
+          heightClass="h-[300px] sm:h-[350px] md:h-[400px]"
+        />
+      </div>
+    ) : (
+      <p class="description-listing">
+        {t.listingDetail.map.locationUnavailableMessage}
+      </p>
+    )
+  }
+</div>

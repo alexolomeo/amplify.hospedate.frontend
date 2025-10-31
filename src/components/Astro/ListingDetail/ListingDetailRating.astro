@@ -1,0 +1,98 @@
+---
+import RatingCategory from '@/components/React/Listing/RatingCategory';
+import type { OverallRating, Rating } from '@/types/listing/rating';
+import { getSafeArray } from '@/utils/displayHelpers';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+import { Icon } from 'astro-icon/components';
+import clsx from 'clsx';
+import AppButton from '../Common/AppButton.astro';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+
+interface Props {
+  rating: Rating;
+  flex?: string;
+  flexContent?: string;
+  progresWidth?: string;
+  isModal?: boolean;
+  scoreSize?: string;
+  starSize?: string;
+  description?: string;
+}
+const {
+  rating,
+  flex = 'flex flex-col lg:flex-row lg:pr-96',
+  flexContent = 'hidden lg:flex',
+  progresWidth = 'w-30',
+  isModal = false,
+  scoreSize = 'text-8xl',
+  starSize = 'h-20 w-20',
+  description = 'py-4 text-base',
+}: Props = Astro.props;
+
+const overallRating = getSafeArray(rating.overallRating);
+---
+
+<div>
+  {
+    !rating ? (
+      <div class="rounded-lg bg-gray-100 p-8 text-center">
+        {t.listingDetail.rating.notAvailable}
+      </div>
+    ) : (
+      <div class={isModal ? 'space-y-6' : 'space-y-6 py-10'}>
+        {isModal && (
+          <form method="dialog" class="block md:hidden lg:hidden">
+            <AppButton label="✕" variant="circle" type="submit" />
+          </form>
+        )}
+        <div
+          class={clsx(
+            'items-center justify-center gap-6 lg:items-start lg:justify-start',
+            flex
+          )}
+        >
+          <div class="flex items-center gap-4">
+            <span class={clsx('text-primary font-bold', scoreSize)}>
+              {rating.score.toFixed(1)}
+            </span>
+            <Icon
+              name={'star'}
+              aria-hidden="true"
+              class={clsx('text-accent', starSize)}
+            />
+          </div>
+          <div class="flex-1 flex-col text-center lg:text-left">
+            <h1 class="justify-center text-2xl font-medium">
+              {t.listingDetail.rating.title}
+            </h1>
+            <p class={clsx(description)}>
+              {t.listingDetail.rating.description}
+            </p>
+          </div>
+        </div>
+        <div class={clsx('gap-6', flexContent)}>
+          {rating.overallRating && (
+            <div class="space-y-4 text-xs">
+              <h2>{t.listingDetail.rating.overall}</h2>
+              <ul>
+                {[...overallRating].reverse().map((item: OverallRating) => (
+                  <li class="flex flex-nowrap items-center">
+                    <span class="pr-2">{item.score}</span>
+                    <progress
+                      class={clsx('progress text-secondary h-1', progresWidth)}
+                      value={item.count}
+                      max="100"
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <RatingCategory rating={rating} isModal={isModal} lang={lang} />
+        </div>
+      </div>
+    )
+  }
+</div>

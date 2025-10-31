@@ -1,0 +1,58 @@
+---
+import clsx from 'clsx';
+import AppButton from './AppButton.astro';
+const {
+  id = 'default-modal',
+  title = '',
+  showHeader = true,
+  showFooter = true,
+  maxWidth = 'max-w-md',
+  maxHeight = 'max-h-[80vh]',
+  maxHeightBody = 'max-h-[70vh]',
+  bgColor = '',
+} = Astro.props;
+---
+
+<dialog id={id} class="modal">
+  <div
+    class={clsx(
+      'modal-box relative rounded-[40px]',
+      maxWidth,
+      bgColor,
+      maxHeight
+    )}
+  >
+    <!-- Header (optional) -->
+    {
+      showHeader && (
+        <div class="sticky top-0 z-10">
+          <div class="mb-4 flex items-center justify-between">
+            <div class="self-stretch text-xl leading-9 font-bold md:text-2xl lg:text-3xl">
+              {title}
+            </div>
+            <form method="dialog">
+              <AppButton label="✕" variant="circle" type="submit" />
+            </form>
+          </div>
+        </div>
+      )
+    }
+    <!-- Body (always present) -->
+    <div class={clsx('overflow-y-auto', maxHeightBody)}>
+      <slot name="body" />
+    </div>
+
+    <!-- Footer (optional) -->
+    {
+      showFooter && (
+        <div class="mt-4 flex justify-end">
+          <slot name="footer">
+            <form method="dialog">
+              <button class="btn btn-primary">Cerrar</button>
+            </form>
+          </slot>
+        </div>
+      )
+    }
+  </div>
+</dialog>

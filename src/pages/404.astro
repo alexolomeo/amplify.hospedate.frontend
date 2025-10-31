@@ -1,0 +1,33 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+---
+
+<MainLayout title={t.notFoundPage.title}>
+  <div class="space-y-6 py-20 text-center">
+    <h1 class="text-primary text-xl font-normal">
+      {t.notFoundPage.heading1}
+      <span class="font-bold">
+        {t.notFoundPage.heading2}
+      </span>
+      {t.notFoundPage.heading3}
+    </h1>
+    <div class="flex justify-center">
+      <img src="/images/pages/404.webp" alt="404" class="h-60 w-60" />
+    </div>
+    <div class="flex justify-center">
+      <p class="max-w-3xl text-2xl font-normal lg:text-4xl">
+        {t.notFoundPage.description1}
+        <span class="text-primary">
+          {t.notFoundPage.description2}
+        </span>
+        {t.notFoundPage.description3}
+      </p>
+    </div>
+    <a href="/" class="btn btn-primary rounded-full py-4">
+      {t.notFoundPage.backToHome}
+    </a>
+  </div>
+</MainLayout>

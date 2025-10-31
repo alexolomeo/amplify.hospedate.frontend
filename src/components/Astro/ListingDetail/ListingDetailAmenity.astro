@@ -1,0 +1,76 @@
+---
+import { getSafeArray } from '@/utils/displayHelpers';
+import { Icon } from 'astro-icon/components';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+import type { Amenity } from '@/types/listing/amenity';
+import Modal from '@/components/Astro/Common/Modal.astro';
+import { iconExists } from '@/utils/iconUtils';
+import AmenitiesGroupedList from './AmenitiesGroupedList.astro';
+import AppButton from '../Common/AppButton.astro';
+import { translateAmenity } from '@/utils/translateAmenity';
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+const previewAmenityLimit = 10;
+interface Props {
+  amenities: Amenity[];
+}
+const { amenities }: Props = Astro.props;
+const safeAmenities = getSafeArray(amenities, []);
+const previewAmenities = safeAmenities.slice(0, previewAmenityLimit);
+
+if (safeAmenities.length === 0) {
+  return null;
+}
+---
+
+<div>
+  <div class="space-y-6 py-8">
+    <h2 class="title-listing">
+      {t.listingDetail.amenities.title}
+    </h2>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      {
+        previewAmenities.map((amenity: Amenity) => {
+          const iconPath = `amenities/${amenity.icon}`;
+          const iconName = iconExists(iconPath) ? iconPath : 'news';
+          return (
+            <div class="flex items-center gap-4 text-sm">
+              <Icon
+                name={iconName}
+                class="text-secondary h-4 w-4 flex-shrink-0"
+                aria-hidden="true"
+              />
+              <p class="flex-1 justify-center leading-tight font-normal">
+                {translateAmenity(amenity.icon, t)}
+              </p>
+            </div>
+          );
+        })
+      }
+    </div>
+    {
+      safeAmenities.length > 10 && (
+        <AppButton
+          label={t.listingDetail.amenities.showAll}
+          modalId="amenities_modal"
+          outline={true}
+          icon="chevron-right"
+          color="secondary"
+        />
+      )
+    }
+  </div>
+  <Modal
+    id="amenities_modal"
+    title={t.listingDetail.amenities.title}
+    showFooter={false}
+    showHeader={true}
+    maxWidth={'max-w-md'}
+    maxHeight={'max-h-md'}
+    bgColor={'bg-[var(--color-base-150)]'}
+  >
+    <div slot="body">
+      <AmenitiesGroupedList amenities={safeAmenities} lang={lang} />
+    </div>
+  </Modal>
+</div>

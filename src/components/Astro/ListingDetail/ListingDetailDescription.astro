@@ -1,0 +1,53 @@
+---
+import Modal from '@/components/Astro/Common/Modal.astro';
+import { getSafeText } from '@/utils/displayHelpers';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+import AppButton from '../Common/AppButton.astro';
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+
+interface Props {
+  description: string;
+}
+const { description }: Props = Astro.props;
+const safeDescription = getSafeText(description, lang);
+const MAX_CHARACTERS = 200;
+const isLong = safeDescription.length > MAX_CHARACTERS;
+const previewText = isLong
+  ? safeDescription.slice(0, MAX_CHARACTERS) + '...'
+  : safeDescription;
+---
+
+<>
+  <div class="space-y-6 py-8">
+    <h2 class="title-listing">
+      {t.listingDetail.description.title}
+    </h2>
+    <p class="description-listing">
+      {previewText}
+    </p>
+    {
+      isLong && (
+        <AppButton
+          label={t.listingDetail.description.showMore}
+          modalId="description_modal"
+          outline={true}
+          icon="chevron-right"
+          color="secondary"
+          size="sm"
+        />
+      )
+    }
+  </div>
+  <Modal
+    id="description_modal"
+    title={t.listingDetail.description.aboutSpace}
+    showFooter={false}
+    lang={lang}
+    bgColor={'bg-[var(--color-base-150)]'}
+  >
+    <div slot="body">
+      <p class="text-base whitespace-pre-line">{safeDescription}</p>
+    </div>
+  </Modal>
+</>

@@ -1,0 +1,13 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+import ReservationView from '@/components/React/Host/ReservationView';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+const title = t.hosting.pageTitles.reservations;
+---
+
+<MainLayout title={title} isHosting={true}>
+  <ReservationView client:idle lang={lang} />
+</MainLayout>

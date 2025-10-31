@@ -1,0 +1,10 @@
+---
+import AuthPageContainer from '@/components/React/Auth/AuthPageContainer';
+import AuthLayout from '@/layouts/AuthLayout.astro';
+
+const title = 'Inicia sesión';
+---
+
+<AuthLayout title={title}>
+  <AuthPageContainer client:load />
+</AuthLayout>

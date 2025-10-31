@@ -1,0 +1,41 @@
+---
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+import CalendarContainer from '@/components/React/Host/Calendar/CalendarContainer';
+import ProtectedLayout from '@/layouts/ProtectedLayout.astro';
+
+const { path } = Astro.params;
+
+// El path es undefined para la URL `/calendar`.
+// Si existe, lo dividimos. Si no, usamos un array vacío.
+const pathSegments = path ? path.split('/') : [];
+const [listingIdFromUrl, action, startDate, endDate] = pathSegments;
+const listingIdFromUrlNumber = listingIdFromUrl
+  ? parseInt(listingIdFromUrl, 10)
+  : undefined;
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+const title = t.hosting.pageTitles.calendar;
+---
+
+<ProtectedLayout
+  title={title}
+  isHosting={true}
+  requires={{ host: true }}
+  showFooter={false}
+>
+  <section class="mx-auto flex w-full flex-1 md:px-4 lg:px-8">
+    <div class="flex w-full overflow-hidden bg-white">
+      <main class="flex w-full flex-1 flex-col">
+        <CalendarContainer
+          lang={lang}
+          client:load
+          listingIdFromUrl={listingIdFromUrlNumber}
+          action={action}
+          startDate={startDate}
+          endDate={endDate}
+        />
+      </main>
+    </div>
+  </section>
+</ProtectedLayout>

@@ -1,0 +1,75 @@
+---
+import FilterLayout from '@/layouts/FilterLayout.astro';
+import SearchResultContainer from '@/components/React/Search/SearchResult/SearchResultContainer';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+import { Flexible, SearchCalendarTab, type QueryParams } from '@/types/search';
+import { SearchType } from '@/types/search';
+
+const url = new URL(Astro.request.url);
+const params = url.searchParams;
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+const activeTab = params.get('activeTab');
+
+const queryParams: QueryParams = {
+  adults: Number(params.get('adults')) || 1,
+  limit: Number(params.get('limit')) || 12,
+  offset: Number(params.get('offset')) || 0,
+  searchType: SearchType.List,
+};
+const place = params.get('placeId');
+if (place) {
+  queryParams.placeId = place;
+}
+const children = Number(params.get('children'));
+if (children > 0) {
+  queryParams.children = children;
+}
+
+const infants = Number(params.get('infants'));
+if (infants > 0) {
+  queryParams.infants = infants;
+}
+
+const numPets = Number(params.get('numPets'));
+if (numPets > 0) {
+  queryParams.numPets = numPets;
+}
+
+if (activeTab === SearchCalendarTab.Calendar) {
+  queryParams.checkInDate = params.get('checkInDate') || '';
+  queryParams.checkoutDate = params.get('checkoutDate') || '';
+}
+
+if (activeTab === SearchCalendarTab.Months) {
+  queryParams.checkInDate = params.get('monthStart') || '';
+  queryParams.checkoutDate = params.get('monthEnd') || '';
+}
+if (activeTab === SearchCalendarTab.Flexible) {
+  queryParams.flexible = params.get('flexible') as Flexible | undefined;
+}
+
+const getShortDestination = (fullDestination: string | null): string => {
+  if (!fullDestination || typeof fullDestination !== 'string') {
+    return '';
+  }
+  const parts = fullDestination.split(',').map((part) => part.trim());
+  return parts.length > 0 ? ', ' + parts[0] : '';
+};
+
+let googleDestination = params.get('googleDestination');
+if (googleDestination) {
+  googleDestination = getShortDestination(
+    decodeURIComponent(googleDestination)
+  );
+}
+---
+
+<FilterLayout title={t.search.searchResults}>
+  <SearchResultContainer
+    client:load
+    queryParams={queryParams}
+    lang={lang}
+    googleDescription={googleDestination}
+  />
+</FilterLayout>

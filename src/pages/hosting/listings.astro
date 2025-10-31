@@ -1,0 +1,13 @@
+---
+import ProtectedLayout from '@/layouts/ProtectedLayout.astro';
+import { detectLanguage, getTranslation } from '@/utils/i18n';
+import ListingSection from '@/components/React/Host/Listings/ListingSection';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+const t = getTranslation(lang);
+const title = t.hosting.pageTitles.listings;
+---
+
+<ProtectedLayout title={title} isHosting={true} requires={{ host: true }}>
+  <ListingSection client:idle lang={lang} />
+</ProtectedLayout>

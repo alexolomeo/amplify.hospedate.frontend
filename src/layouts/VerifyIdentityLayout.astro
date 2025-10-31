@@ -1,0 +1,110 @@
+---
+import '../styles/global.css';
+
+import { ClientRouter } from 'astro:transitions';
+import { detectLanguage } from '@/utils/i18n';
+import HeaderVerifyIdentity from '@/components/Astro/HeaderVerifyIdentity.astro';
+import AuthContainer from '@/components/React/Auth/AuthContainer';
+import GlobalToastProvider from '@/components/ui/GlobalToastProvider';
+import GlobalFCMProvider from '@/components/ui/FCMProvider';
+import TimezoneBootstrap from '@/components/React/Utils/TimezoneBootstrap';
+
+const headers = Astro.request.headers;
+const url = new URL(Astro.request.url);
+const lang = detectLanguage(headers, url);
+
+// Check if we need to set a language cookie
+if (url.searchParams.get('lang')) {
+  Astro.response.headers.set(
+    'Set-Cookie',
+    `lang=${lang}; Path=/; HttpOnly; SameSite=Lax;`
+  );
+}
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<html lang={lang} class="h-full" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      sizes="16x16"
+      href="/favicon-16x16.svg"
+    />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <ClientRouter />
+    <title>{title}</title>
+    <style>
+      /* Fix mobile viewport height - accounts for browser UI */
+      :root {
+        --vh: 1vh;
+      }
+
+      @supports (height: 100dvh) {
+        /* Use dynamic viewport height if supported (modern browsers) */
+        html,
+        body {
+          height: 100dvh;
+        }
+      }
+
+      @supports not (height: 100dvh) {
+        /* Fallback for older browsers */
+        html,
+        body {
+          height: calc(var(--vh, 1vh) * 100);
+        }
+      }
+    </style>
+    <script>
+      // Set CSS variable for mobile viewport height
+      function setVh() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      }
+      setVh();
+      window.addEventListener('resize', setVh);
+      window.addEventListener('orientationchange', setVh);
+    </script>
+  </head>
+  <body class="bg-base-100 flex min-h-full flex-col">
+    <HeaderVerifyIdentity />
+
+    <main class="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
+      <slot />
+    </main>
+    <AuthContainer client:load lang={lang} />
+    <GlobalToastProvider client:load />
+    <GlobalFCMProvider client:load lang={lang} />
+    <TimezoneBootstrap client:load />
+    <script>
+      import { sessionService } from '@/services/SessionService';
+      import { AuthEventEmitter } from '@/utils/authEventEmitter';
+      sessionService.initClient();
+      const go = (path: string) => {
+        if (window.location.pathname !== path) window.location.assign(path);
+      };
+
+      AuthEventEmitter.on('route.forbidden', () => go('/403'));
+      AuthEventEmitter.on('route.notfound', () => go('/404'));
+      AuthEventEmitter.on('auth.unrecoverable', () => go('/500'));
+    </script>
+    <slot name="scripts" />
+  </body>
+</html>

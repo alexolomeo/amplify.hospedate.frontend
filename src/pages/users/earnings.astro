@@ -1,0 +1,11 @@
+---
+import EarningsView from '@/components/React/Host/EarningsView';
+import ProtectedLayout from '@/layouts/ProtectedLayout.astro';
+import { detectLanguage } from '@/utils/i18n';
+
+const lang = detectLanguage(Astro.request.headers, new URL(Astro.request.url));
+---
+
+<ProtectedLayout title="Editar perfil">
+  <EarningsView client:only="react" lang={lang} />
+</ProtectedLayout>
