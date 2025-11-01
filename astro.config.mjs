@@ -42,9 +42,6 @@ export default defineConfig({
   integrations: [icon(), react()],
   output: 'server',
   adapter: awsAmplify(),	
-//  adapter: node({
-//    mode: 'standalone',
-//  }),
   compressHTML: true,
   build: {
     inlineStylesheets: 'auto',
