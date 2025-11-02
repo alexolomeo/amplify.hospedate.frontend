@@ -18,6 +18,8 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss(), svgr()],
     build: {
+      minify: true,
+      terserOptions: { compress: true, mangle: true },
       cssMinify: 'lightningcss',
       rollupOptions: {
         output: {
