@@ -11,15 +11,12 @@ import react from '@astrojs/react';
 
 import svgr from 'vite-plugin-svgr';
 
-import awsAmplify from 'astro-aws-amplify';
 
 // https://astro.build/config
 export default defineConfig({
   vite: {
     plugins: [tailwindcss(), svgr()],
     build: {
-      minify: true,
-      terserOptions: { compress: true, mangle: true },
       cssMinify: 'lightningcss',
       rollupOptions: {
         output: {
@@ -43,7 +40,9 @@ export default defineConfig({
   },
   integrations: [icon(), react()],
   output: 'server',
-  adapter: awsAmplify(),	
+  adapter: node({
+    mode: 'standalone',
+  }),	
   compressHTML: true,
   build: {
     inlineStylesheets: 'auto',
